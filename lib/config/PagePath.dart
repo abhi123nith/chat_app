@@ -2,7 +2,9 @@
 
 import 'package:chat_app/Pages/Auth/AuthPage.dart';
 import 'package:chat_app/Pages/Home/HomePage.dart';
+import 'package:chat_app/Pages/UserProfile/UpdateProfile.dart';
 import 'package:get/get.dart';
+
 import '../Pages/ContactPage/ContactPage.dart';
 import '../Pages/ProfilePage/ProfilePage.dart';
 
@@ -17,7 +19,6 @@ var pagePath = [
     page: () => HomePage(),
     transition: Transition.rightToLeft,
   ),
- 
   GetPage(
     name: "/profilePage",
     page: () => ProfilePage(),
@@ -28,9 +29,9 @@ var pagePath = [
     page: () => ContactPage(),
     transition: Transition.rightToLeft,
   ),
-  // GetPage(
-  //   name: "/updateProfilePage",
-  //   page: () => UserUpdateProfile(),
-  //   transition: Transition.rightToLeft,
-  // ),
+  GetPage(
+    name: "/updateProfilePage",
+    page: () => UserUpdateProfile(),
+    transition: Transition.rightToLeft,
+  ),
 ];

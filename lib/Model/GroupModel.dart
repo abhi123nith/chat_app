@@ -1,5 +1,3 @@
-
-
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'package:chat_app/Model/UserModel.dart';
@@ -48,9 +46,9 @@ class GroupModel {
     if (json["profileUrl"] is String) {
       profileUrl = json["profileUrl"];
     }
-    // if (json["members"] is Map) {
-    //   json["members"] == null ? null : UserModel.fromJson(json["members"]);
-    // }
+    if (json["members"] is Map) {
+      json["members"] == null ? null : UserModel.fromJson(json["members"]);
+    }
 
     if (json["members"] != null) {
       members = List<UserModel>.from(

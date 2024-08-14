@@ -1,15 +1,16 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/Controller/AuthController.dart';
 import 'package:chat_app/Controller/ImagePicker.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
 import 'package:chat_app/Widget/PrimaryButton.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -36,7 +37,11 @@ class ProfilePage extends StatelessWidget {
         title: const Text("Profile"),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(profileController.currentUser.value.id)
+                  .update({'Status': 'Offline'});
               authController.logoutUser();
             },
             icon: const Icon(Icons.logout),

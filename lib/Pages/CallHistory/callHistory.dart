@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-
 import '../../Config/Images.dart';
 
 class CallHistory extends StatelessWidget {
@@ -42,7 +41,8 @@ class CallHistory extends StatelessWidget {
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
                             const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) => const Icon(Icons.error),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       )),
                   title: Text(
                     snapshot.data![index].callerUid ==
@@ -58,11 +58,15 @@ class CallHistory extends StatelessWidget {
                   trailing: snapshot.data![index].type == "video"
                       ? IconButton(
                           icon: const Icon(Icons.video_call),
-                          onPressed: () {},
+                          onPressed: () {
+                            print(snapshot.data![index].type);
+                          },
                         )
                       : IconButton(
                           icon: const Icon(Icons.call),
-                          onPressed: () {},
+                          onPressed: () {
+                            print(snapshot.data![index].type);
+                          },
                         ),
                 );
               },

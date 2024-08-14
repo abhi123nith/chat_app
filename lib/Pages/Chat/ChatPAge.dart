@@ -8,9 +8,11 @@ import 'package:chat_app/Controller/CallController.dart';
 import 'package:chat_app/Controller/ChatController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
 import 'package:chat_app/Model/UserModel.dart';
+import 'package:chat_app/Pages/CallPage/AudioCallPage.dart';
+import 'package:chat_app/Pages/CallPage/VideoCall.dart';
 import 'package:chat_app/Pages/Chat/Widgets/ChatBubble.dart';
 import 'package:chat_app/Pages/Chat/Widgets/TypeMessage.dart';
-import 'package:chat_app/Pages/UserProfile/ProfilePage.dart';
+import 'package:chat_app/Pages/UserProfile/userprofilenotedit.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -32,7 +34,7 @@ class ChatPage extends StatelessWidget {
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           onTap: () {
-            Get.to(UserProfilePage(
+            Get.to(UserProfilePageWithoutEdit(
               userModel: userModel,
             ));
           },
@@ -57,7 +59,7 @@ class ChatPage extends StatelessWidget {
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           onTap: () {
-            Get.to(UserProfilePage(
+            Get.to(UserProfilePageWithoutEdit(
               userModel: userModel,
             ));
           },
@@ -73,6 +75,9 @@ class ChatPage extends StatelessWidget {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Text("........");
+                      }
+                      if (!snapshot.hasData || snapshot.data!.status == null) {
+                        return const Text("Offline");
                       } else {
                         return Text(
                           snapshot.data!.status ?? "",
@@ -94,9 +99,9 @@ class ChatPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              // Get.to(AudioCallPage(target: userModel));
-              // callController.callAction(
-              //     userModel, profileController.currentUser.value, "audio");
+              Get.to(AudioCallPage(target: userModel));
+              callController.callAction(
+                  userModel, profileController.currentUser.value, "audio");
             },
             icon: const Icon(
               Icons.phone,
@@ -104,14 +109,20 @@ class ChatPage extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
-              // Get.to(VideoCallPage(target: userModel));
-              // callController.callAction(
-              //     userModel, profileController.currentUser.value, "video");
+              
+              Get.to(VideoCallPage(target: userModel));
+              callController.callAction(
+                userModel,
+                profileController.currentUser.value,
+                "video",
+              );
             },
             icon: const Icon(
               Icons.video_call,
             ),
+            
           )
+          
         ],
       ),
       body: Padding(

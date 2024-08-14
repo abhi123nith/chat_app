@@ -1,7 +1,7 @@
-// ignore_for_file: avoid_print, annotate_overrides
-
 import 'package:chat_app/Model/AudioCall.dart';
 import 'package:chat_app/Model/UserModel.dart';
+import 'package:chat_app/Pages/CallPage/AudioCallPage.dart';
+import 'package:chat_app/Pages/CallPage/VideoCall.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ class CallController extends GetxController {
       if (callList.isNotEmpty) {
         var callData = callList[0];
         if (callData.type == "audio") {
-          audioCallNotification(callData);
+          videoCallNotification(callData);
         } else if (callData.type == "video") {
           videoCallNotification(callData);
         }
@@ -38,16 +38,16 @@ class CallController extends GetxController {
       icon: const Icon(Icons.call),
       onTap: (snack) {
         Get.back();
-        //  Get.to(
-        // AudioCallPage(
-        //   target: UserModel(
-        //     id: callData.callerUid,
-        //     name: callData.callerName,
-        //     email: callData.callerEmail,
-        //     profileImage: callData.callerPic,
-        //   ),
-        // ),
-        // );
+        Get.to(
+          AudioCallPage(
+            target: UserModel(
+              id: callData.callerUid,
+              name: callData.callerName,
+              email: callData.callerEmail,
+              profileImage: callData.callerPic,
+            ),
+          ),
+        );
       },
       callData.callerName!,
       "Incoming Audio Call",
@@ -61,6 +61,51 @@ class CallController extends GetxController {
     );
   }
 
+  // Future<void> callAction(
+  //     UserModel reciver, UserModel caller, String type) async {
+  //   String id = uuid;
+  //   DateTime timestamp = DateTime.now();
+  //   String nowTime = DateFormat('hh:mm a').format(timestamp);
+  //   var newCall = CallModel(
+  //     id: id,
+  //     callerName: caller.name,
+  //     callerPic: caller.profileImage,
+  //     callerUid: caller.id,
+  //     callerEmail: caller.email,
+  //     receiverName: reciver.name,
+  //     receiverPic: reciver.profileImage,
+  //     receiverUid: reciver.id,
+  //     receiverEmail: reciver.email,
+  //     status: "dialing",
+  //     type: type,
+  //     time: nowTime,
+  //     timestamp: DateTime.now().toString(),
+  //   );
+
+  //   try {
+  //     await db
+  //         .collection("notification")
+  //         .doc(reciver.id)
+  //         .collection("call")
+  //         .doc(id)
+  //         .set(newCall.toJson());
+  //     await db
+  //         .collection("users")
+  //         .doc(auth.currentUser!.uid)
+  //         .collection("calls")
+  //         .add(newCall.toJson());
+  //     await db
+  //         .collection("users")
+  //         .doc(reciver.id)
+  //         .collection("calls")
+  //         .add(newCall.toJson());
+  //     Future.delayed(const Duration(seconds: 20), () {
+  //       endCall(newCall);
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
   Future<void> callAction(
       UserModel reciver, UserModel caller, String type) async {
     String id = uuid;
@@ -77,7 +122,7 @@ class CallController extends GetxController {
       receiverUid: reciver.id,
       receiverEmail: reciver.email,
       status: "dialing",
-      type: type,
+      type: type, // Ensure this is set correctly
       time: nowTime,
       timestamp: DateTime.now().toString(),
     );
@@ -107,13 +152,29 @@ class CallController extends GetxController {
     }
   }
 
+  // Stream<List<CallModel>> getCallsNotification() {
+  //   return FirebaseFirestore.instance
+  //       .collection("notification")
+  //       .doc(auth.currentUser!.uid)
+  //       .collection("call")
+  //       .snapshots()
+  //       .map((snapshot) => snapshot.docs
+  //           .map((doc) => CallModel.fromJson(doc.data()))
+  //           .toList());
+  // }
   Stream<List<CallModel>> getCallsNotification() {
+    if (auth.currentUser == null) {
+      print("No authenticated user");
+      return const Stream.empty();
+    }
     return FirebaseFirestore.instance
         .collection("notification")
         .doc(auth.currentUser!.uid)
         .collection("call")
         .snapshots()
-        .map((snapshot) => snapshot.docs
+        .handleError((error) {
+      print("Error fetching notifications: $error");
+    }).map((snapshot) => snapshot.docs
             .map((doc) => CallModel.fromJson(doc.data()))
             .toList());
   }
@@ -140,16 +201,16 @@ class CallController extends GetxController {
       icon: const Icon(Icons.video_call),
       onTap: (snack) {
         Get.back();
-        // Get.to(
-        //   VideoCallPage(
-        //     target: UserModel(
-        //       id: callData.callerUid,
-        //       name: callData.callerName,
-        //       email: callData.callerEmail,
-        //       profileImage: callData.callerPic,
-        //     ),
-        //   ),
-        // );
+        Get.to(
+          VideoCallPage(
+            target: UserModel(
+              id: callData.callerUid,
+              name: callData.callerName,
+              email: callData.callerEmail,
+              profileImage: callData.callerPic,
+            ),
+          ),
+        );
       },
       callData.callerName!,
       "Incoming Video Call",

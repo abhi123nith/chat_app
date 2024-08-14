@@ -3,7 +3,6 @@ import 'package:chat_app/Pages/Auth/Widgets/SignUpForm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 class AuthPageBody extends StatelessWidget {
   const AuthPageBody({super.key});
 
@@ -26,13 +25,12 @@ class AuthPageBody extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
-                          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
                         onTap: () {
                           isLogin.value = true;
                         },
-                        // ignore: sized_box_for_whitespace
-                        child: Container(
+                        child: SizedBox(
                           width: MediaQuery.sizeOf(context).width / 2.5,
                           child: Column(
                             children: [
@@ -57,13 +55,13 @@ class AuthPageBody extends StatelessWidget {
                         ),
                       ),
                       InkWell(
-                          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
                         onTap: () {
                           isLogin.value = false;
                         },
                         child: SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 2.5,
+                          width: MediaQuery.sizeOf(context).width / 3,
                           child: Column(
                             children: [
                               Text(

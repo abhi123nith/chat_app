@@ -31,8 +31,9 @@ class ContactPage extends StatelessWidget {
               onPressed: () {
                 isSearchEnable.value = !isSearchEnable.value;
               },
-              icon:
-                  isSearchEnable.value ? const Icon(Icons.close) : const Icon(Icons.search),
+              icon: isSearchEnable.value
+                  ? const Icon(Icons.close)
+                  : const Icon(Icons.search),
             ),
           )
         ],
@@ -42,7 +43,9 @@ class ContactPage extends StatelessWidget {
         child: ListView(
           children: [
             Obx(
-              () => isSearchEnable.value ? const ContactSearch() : const SizedBox(),
+              () => isSearchEnable.value
+                  ? const ContactSearch()
+                  : const SizedBox(),
             ),
             const SizedBox(height: 10),
             NewContactTile(
@@ -76,8 +79,10 @@ class ContactPage extends StatelessWidget {
                           Get.to(ChatPage(userModel: e));
                         },
                         child: ChatTile(
-                          imageUrl:
-                              e.profileImage ?? AssetsImage.defaultProfileUrl,
+                          imageUrl: e.profileImage != null &&
+                                  e.profileImage!.isNotEmpty
+                              ? e.profileImage ?? AssetsImage.defaultProfileUrl
+                              : AssetsImage.defaultProfileUrl,
                           name: e.name ?? "User",
                           lastChat: e.about ?? "Hey there",
                           lastTime: e.email ==

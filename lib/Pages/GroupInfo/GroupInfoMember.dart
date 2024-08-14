@@ -2,7 +2,10 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/Controller/GroupController.dart';
+import 'package:chat_app/Model/UserModel.dart';
+import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../../Controller/ProfileController.dart';
@@ -75,85 +78,85 @@ class GroupMemberInfo extends StatelessWidget {
                     ),
                   ],
                 ),
-                // SizedBox(height: 20),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //   children: [
-                //     Container(
-                //       height: 50,
-                //       padding: EdgeInsets.all(15),
-                //       decoration: BoxDecoration(
-                //         borderRadius: BorderRadius.circular(15),
-                //         color: Theme.of(context).colorScheme.background,
-                //       ),
-                //       child: Row(children: [
-                //         SvgPicture.asset(
-                //           AssetsImage.profileAudioCall,
-                //           width: 25,
-                //         ),
-                //         SizedBox(width: 10),
-                //         Text(
-                //           "Call",
-                //           style: TextStyle(
-                //             color: Color(0xff039C00),
-                //           ),
-                //         )
-                //       ]),
-                //     ),
-                //     Container(
-                //       height: 50,
-                //       padding: EdgeInsets.all(15),
-                //       decoration: BoxDecoration(
-                //         borderRadius: BorderRadius.circular(15),
-                //         color: Theme.of(context).colorScheme.background,
-                //       ),
-                //       child: Row(children: [
-                //         SvgPicture.asset(
-                //           AssetsImage.profileVideoCall,
-                //           width: 25,
-                //           color: Color(0xffFF9900),
-                //         ),
-                //         SizedBox(width: 10),
-                //         Text(
-                //           "Video",
-                //           style: TextStyle(
-                //             color: Color(0xffFF9900),
-                //           ),
-                //         )
-                //       ]),
-                //     ),
-                //     InkWell(
-                //       onTap: () {
-                //         var newMember = UserModel(
-                //           email: "Nitish@gmail.com",
-                //           name: "Nitish",
-                //           profileImage: "",
-                //           role: "admin",
-                //         );
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      height: 50,
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                      child: Row(children: [
+                        SvgPicture.asset(
+                          AssetsImage.profileAudioCall,
+                          width: 25,
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Call",
+                          style: TextStyle(
+                            color: Color(0xff039C00),
+                          ),
+                        )
+                      ]),
+                    ),
+                    Container(
+                      height: 50,
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: Theme.of(context).colorScheme.background,
+                      ),
+                      child: Row(children: [
+                        SvgPicture.asset(
+                          AssetsImage.profileVideoCall,
+                          width: 25,
+                          color: const Color(0xffFF9900),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Video",
+                          style: TextStyle(
+                            color: Color(0xffFF9900),
+                          ),
+                        )
+                      ]),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        var newMember = UserModel(
+                          email: "Nitish@gmail.com",
+                          name: "Nitish",
+                          profileImage: "",
+                          role: "admin",
+                        );
 
-                //         groupController.addMemberToGroup(groupId, newMember);
-                //       },
-                //       child: Container(
-                //         height: 50,
-                //         padding: EdgeInsets.all(15),
-                //         decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(15),
-                //           color: Theme.of(context).colorScheme.background,
-                //         ),
-                //         child: Row(children: [
-                //           SvgPicture.asset(
-                //             AssetsImage.groupAddUser,
-                //             width: 25,
-                //           ),
-                //           SizedBox(width: 10),
-                //           Text(
-                //             "Add",
-                //           )
-                //         ]),
-                //       ),
-                //     )
-                //   ],
-                // )
+                        groupController.addMemberToGroup(groupId, newMember);
+                      },
+                      child: Container(
+                        height: 50,
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Theme.of(context).colorScheme.background,
+                        ),
+                        child: Row(children: [
+                          SvgPicture.asset(
+                            AssetsImage.groupAddUser,
+                            width: 25,
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            "Add",
+                          )
+                        ]),
+                      ),
+                    )
+                  ],
+                )
               ],
             ),
           )
