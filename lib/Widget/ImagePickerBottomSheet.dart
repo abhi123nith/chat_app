@@ -26,17 +26,31 @@ Future<dynamic> ImagePickerBottomSheet(BuildContext context, RxString imagePath,
                 await imagePickerController.pickImage(ImageSource.camera);
             Get.back();
           },
-          child: Container(
-            height: 70,
-            width: 70,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(
-              Icons.camera,
-              size: 30,
-            ),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.camera_alt_outlined,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "Camera",
+                style: TextStyle(color: Colors.white),
+              )
+            ],
           ),
         ),
         InkWell(
@@ -45,32 +59,64 @@ Future<dynamic> ImagePickerBottomSheet(BuildContext context, RxString imagePath,
                 await imagePickerController.pickImage(ImageSource.gallery);
             Get.back();
           },
-          child: Container(
-            height: 70,
-            width: 70,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(
-              Icons.photo,
-              size: 30,
-            ),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.photo,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "Gallery",
+                style: TextStyle(color: Colors.white),
+              )
+            ],
           ),
         ),
         InkWell(
-          onTap: () {},
-          child: Container(
-            height: 70,
-            width: 70,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(
-              Icons.play_arrow,
-              size: 30,
-            ),
+          onTap: () async {
+            imagePath.value =
+                await imagePickerController.pickVideo(ImageSource.gallery);
+            Get.back();
+          },
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "Video",
+                style: TextStyle(color: Colors.white),
+              )
+            ],
           ),
         )
       ],

@@ -37,6 +37,7 @@ class GroupPage extends StatelessWidget {
                     : groups[index].profileUrl!,
                 lastChat: "Group Created",
                 lastTime: "Just Now",
+                roomId: groups[index].id ?? '',
               ),
             );
           },

@@ -30,7 +30,9 @@ class NewGroup extends StatelessWidget {
             if (groupController.groupMembers.isEmpty) {
               Get.snackbar("Error", "Please select atleast one member");
             } else {
-              Get.to(const GroupTitle());
+              Get.to(const GroupTitle()
+
+              );
             }
           },
           child: Icon(
@@ -87,7 +89,7 @@ class NewGroup extends StatelessWidget {
                                 AssetsImage.defaultProfileUrl,
                             name: snapshot.data![index].name!,
                             lastChat: snapshot.data![index].about ?? "",
-                            lastTime: "",
+                            lastTime: "", roomId: '',
                           ),
                         );
                       },

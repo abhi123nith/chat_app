@@ -7,7 +7,6 @@ import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 import '../../../Model/ChatRoomModel.dart';
 
 class ChatList extends StatelessWidget {
@@ -27,37 +26,54 @@ class ChatList extends StatelessWidget {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         }
-        List<ChatRoomModel>? e = snapshot.data;
+        List<ChatRoomModel>? chatRooms = snapshot.data;
 
+        if (chatRooms == null || chatRooms.isEmpty) {
+          return const Center(child: Text('No chat rooms available.'));
+        }
         return ListView.builder(
-          itemCount: e!.length,
+          itemCount: chatRooms.length,
           itemBuilder: (context, index) {
+            ChatRoomModel chatRoom = chatRooms[index];
+            String? roomId = chatRoom.id;
+
+            // Ensure roomId is not null or empty
+            if (roomId == null || roomId.isEmpty) {
+              return const SizedBox.shrink(); // Skip this tile
+            }
+            String currentUserId = profileController.currentUser.value.id ?? '';
+
+            // Determine userModel and imageUrl
+            var userModel = chatRoom.receiver!.id == currentUserId
+                ? chatRoom.sender
+                : chatRoom.receiver;
+
             return InkWell(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onTap: () {
-                chatController.markMessagesAsRead(e[index].id!);
+                chatController.markMessagesAsRead(roomId);
                 Get.to(
                   ChatPage(
-                    userModel: (e[index].receiver!.id ==
-                            profileController.currentUser.value.id
-                        ? e[index].sender
-                        : e[index].receiver)!,
+                    userModel: userModel!,
                   ),
                 );
               },
-              child: ChatTile(
-                imageUrl: (e[index].receiver!.id ==
-                            profileController.currentUser.value.id
-                        ? e[index].sender!.profileImage
-                        : e[index].receiver!.profileImage) ??
-                    AssetsImage.defaultProfileUrl,
-                name: (e[index].receiver!.id ==
-                        profileController.currentUser.value.id
-                    ? e[index].sender!.name
-                    : e[index].receiver!.name)!,
-                lastChat: e[index].lastMessage ?? "Last Message",
-                lastTime: e[index].lastMessageTimestamp ?? "Last Time",
+              child: StreamBuilder<int>(
+                stream: chatController.getUnreadMessageCount(roomId),
+                builder: (context, snapshot) {
+                  int unreadCount = snapshot.data ?? 0;
+
+                  return ChatTile(
+                    imageUrl: userModel!.profileImage ??
+                        AssetsImage.defaultProfileUrl,
+                    name: userModel.name ?? 'User',
+                    lastChat: chatRoom.lastMessage ?? 'Last Message',
+                    lastTime: chatRoom.lastMessageTimestamp ?? 'Last Time',
+                    roomId: roomId,
+                    unreadCount: unreadCount, // Pass unread count to ChatTile
+                  );
+                },
               ),
             );
           },

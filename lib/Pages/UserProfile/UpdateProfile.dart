@@ -2,14 +2,13 @@
 
 import 'package:chat_app/Widget/PrimaryButton.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 
 class UserUpdateProfile extends StatelessWidget {
   const UserUpdateProfile({super.key});
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text("Update Profile"),
@@ -66,7 +65,7 @@ class UserUpdateProfile extends StatelessWidget {
                     const TextField(
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
-                        hintText: "Nitish Kumar",
+                        hintText: "Godara",
                         prefixIcon: Icon(
                           Icons.person,
                         ),
@@ -117,7 +116,10 @@ class UserUpdateProfile extends StatelessWidget {
                         PrimaryButton(
                           btnName: "Save",
                           icon: Icons.save,
-                          ontap: () {},
+                          ontap: () {
+                            Get.snackbar('Profile Updated', '',
+                                backgroundColor: Colors.green);
+                          },
                         ),
                       ],
                     )

@@ -1,16 +1,14 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/Controller/AuthController.dart';
 import 'package:chat_app/Controller/ImagePicker.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
+import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:chat_app/Widget/PrimaryButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -37,12 +35,9 @@ class ProfilePage extends StatelessWidget {
         title: const Text("Profile"),
         actions: [
           IconButton(
-            onPressed: () async {
-              await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(profileController.currentUser.value.id)
-                  .update({'Status': 'Offline'});
-              authController.logoutUser();
+            onPressed: () {
+              _showLogoutConfirmationDialog(
+                  context, authController, profileController);
             },
             icon: const Icon(Icons.logout),
           ),
@@ -54,7 +49,6 @@ class ProfilePage extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              // height: 300,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(20),
@@ -74,10 +68,10 @@ class ProfilePage extends StatelessWidget {
                                       splashColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        imagePath.value =
-                                            await imagePickerController
-                                                .pickImage(ImageSource.gallery);
-                                        print("Image Picked${imagePath.value}");
+                                        // imagePath.value =
+                                        //     await imagePickerController
+                                        //         .pickImage(ImageSource.gallery);
+                                        // print("Image Picked${imagePath.value}");
                                       },
                                       child: Container(
                                         height: 200,
@@ -122,21 +116,57 @@ class ProfilePage extends StatelessWidget {
                                           ? const Icon(
                                               Icons.image,
                                             )
-                                          : ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                              child: CachedNetworkImage(
-                                                imageUrl: profileController
-                                                    .currentUser
-                                                    .value
-                                                    .profileImage!,
-                                                fit: BoxFit.cover,
-                                                placeholder: (context, url) =>
-                                                    const CircularProgressIndicator(),
-                                                errorWidget:
-                                                    (context, url, error) =>
+                                          : InkWell(
+                                              onTap: () {
+                                                String imageUrlToUse;
+
+                                                if (imagePath
+                                                    .value.isNotEmpty) {
+                                                  // If the user has picked a new image, use the new image path
+                                                  imageUrlToUse =
+                                                      imagePath.value;
+                                                } else if (profileController
+                                                            .currentUser
+                                                            .value
+                                                            .profileImage !=
+                                                        null &&
+                                                    profileController
+                                                        .currentUser
+                                                        .value
+                                                        .profileImage!
+                                                        .isNotEmpty) {
+                                                  // If there's an existing profile image, use it
+                                                  imageUrlToUse =
+                                                      profileController
+                                                          .currentUser
+                                                          .value
+                                                          .profileImage!;
+                                                } else {
+                                                  // Handle the case when there's no image selected or available
+                                                  imageUrlToUse =
+                                                      ""; // or set a default image URL
+                                                }
+                                                Get.to(FullProfilePicUrl(
+                                                    imageUrl: imageUrlToUse));
+                                              },
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: profileController
+                                                        .currentUser
+                                                        .value
+                                                        .profileImage!,
+                                                    fit: BoxFit.cover,
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        const CircularProgressIndicator(),
+                                                    errorWidget: (context, url,
+                                                            error) =>
                                                         const Icon(Icons.error),
-                                              )),
+                                                  )),
+                                            ),
                                     ),
                             )
                           ],
@@ -210,6 +240,12 @@ class ProfilePage extends StatelessWidget {
                                           phone.text,
                                         );
                                         isEdit.value = false;
+                                        Get.snackbar(" Profile Updated ", "",
+                                            colorText: Colors.white,
+                                            margin: const EdgeInsets.all(8),
+                                            backgroundColor: Colors.green,
+                                            icon: const Icon(
+                                                Icons.download_done_rounded));
                                       },
                                     )
                                   : PrimaryButton(
@@ -232,6 +268,44 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showLogoutConfirmationDialog(BuildContext context,
+      AuthController authController, ProfileController profileController) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Logout"),
+          content: const Text("Are you sure you want to logout?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(); // Close the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(profileController.currentUser.value.id)
+                    .update({'Status': 'Offline'});
+                authController.logoutUser();
+                // Get.showSnackbar(snackbar)
+                Get.snackbar("Succesfully Logout ", "",
+                    colorText: Colors.white,
+                    margin: const EdgeInsets.all(8),
+                    backgroundColor: Colors.green,
+                    icon: const Icon(Icons.download_done_rounded));
+                Get.back(); // Close the dialog and log out
+              },
+              child: const Text("Logout"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

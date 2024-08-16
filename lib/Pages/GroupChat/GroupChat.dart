@@ -1,6 +1,5 @@
-// ignore_for_file: avoid_unnecessary_containers
-
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/Controller/GroupController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
@@ -8,20 +7,21 @@ import 'package:chat_app/Model/GroupModel.dart';
 import 'package:chat_app/Pages/Chat/Widgets/ChatBubble.dart';
 import 'package:chat_app/Pages/GroupChat/GroupTypeMessage.dart';
 import 'package:chat_app/Pages/GroupInfo/GroupInfo.dart';
+import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-
 class GroupChatPage extends StatelessWidget {
   final GroupModel groupModel;
+
   const GroupChatPage({super.key, required this.groupModel});
 
   @override
   Widget build(BuildContext context) {
-    GroupController groupController = Get.put(GroupController());
-    ProfileController profileController = Get.put(ProfileController());
+    final GroupController groupController = Get.put(GroupController());
+    final ProfileController profileController = Get.put(ProfileController());
 
     return Scaffold(
       appBar: AppBar(
@@ -29,13 +29,16 @@ class GroupChatPage extends StatelessWidget {
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           onTap: () {
-            // Get.to(UserProfilePage(
-            //   userModel: userModel,
-            // ));
+            // Add functionality if needed
           },
           child: Padding(
             padding: const EdgeInsets.all(5),
-            child: Container(
+            child: GestureDetector(
+              onTap: () => FullProfilePicUrl(
+                imageUrl: groupModel.profileUrl == ""
+                    ? AssetsImage.defaultProfileUrl
+                    : groupModel.profileUrl!,
+              ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
                 child: CachedNetworkImage(
@@ -43,7 +46,8 @@ class GroupChatPage extends StatelessWidget {
                       ? AssetsImage.defaultProfileUrl
                       : groupModel.profileUrl!,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => const CircularProgressIndicator(),
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
@@ -90,7 +94,8 @@ class GroupChatPage extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
+        padding:
+            const EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
         child: Column(
           children: [
             Expanded(

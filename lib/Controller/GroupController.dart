@@ -6,10 +6,13 @@ import 'package:chat_app/Pages/Home/HomePage.dart';
 import 'package:chat_app/config/CustomMessage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
 class GroupController extends GetxController {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final db = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   RxList<UserModel> groupMembers = <UserModel>[].obs;
@@ -148,14 +151,119 @@ class GroupController extends GetxController {
         );
   }
 
+  Future<bool> isUserAdmin(String groupId, String userId) async {
+    try {
+      final groupDoc = await _firestore.collection('groups').doc(groupId).get();
+      final groupData = groupDoc.data();
+
+      if (groupData != null) {
+        final members =
+            List<Map<String, dynamic>>.from(groupData['members'] ?? []);
+        final user = members.firstWhere(
+          (member) => member['id'] == userId,
+          //orElse: () => null
+        );
+
+        return user['role'] == 'admin';
+      }
+
+      return false;
+    } catch (e) {
+      print("Error checking admin status: $e");
+      return false;
+    }
+  }
+
   Future<void> addMemberToGroup(String groupId, UserModel user) async {
-    isLoading.value = true;
-    await db.collection("groups").doc(groupId).update(
-      {
-        "members": FieldValue.arrayUnion([user.toJson()]),
+    try {
+      // Add the user to the group
+      await _firestore.collection('groups').doc(groupId).update({
+        'members': FieldValue.arrayUnion([user.toJson()]),
+      });
+
+      // Optionally, you might want to add the group to the user's list of groups
+      await _firestore.collection('users').doc(user.id).update({
+        'groups': FieldValue.arrayUnion([groupId]),
+      });
+
+      Get.snackbar("Success", "Member added to the group successfully");
+    } catch (e) {
+      Get.snackbar("Error", "Failed to add member to the group: $e");
+    }
+  }
+
+  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> showEditGroupDialog(BuildContext context, String groupId,
+      String currentName, String currentDescription) async {
+    final TextEditingController nameController =
+        TextEditingController(text: currentName);
+    final TextEditingController descriptionController =
+        TextEditingController(text: currentDescription);
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Group Information"),
+          content: SizedBox(
+            width: 300, // Adjust width as needed
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Group Name',
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Group Description',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(); // Close the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Save updated information
+                await _updateGroupInfo(
+                    groupId, nameController.text, descriptionController.text);
+                Get.back(); // Close the dialog
+                Get.snackbar("Group info updated", "",
+                    colorText: Colors.white,
+                    margin: const EdgeInsets.all(8),
+                    backgroundColor: Colors.green,
+                    icon: const Icon(Icons.download_done_rounded));
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
       },
     );
-    getGroups();
-    isLoading.value = false;
+  }
+
+  Future<void> _updateGroupInfo(
+      String groupId, String newName, String newDescription) async {
+    try {
+      await _firestore.collection('groups').doc(groupId).update({
+        'name': newName,
+        'description': newDescription,
+      });
+    } catch (e) {
+      // Handle error
+      print("Failed to update group info: $e");
+    }
   }
 }

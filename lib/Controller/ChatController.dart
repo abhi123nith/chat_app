@@ -16,7 +16,7 @@ class ChatController extends GetxController {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
   RxBool isLoading = false.obs;
-  
+
   var uuid = const Uuid();
   RxString selectedImagePath = "".obs;
   @override
@@ -78,7 +78,7 @@ class ChatController extends GetxController {
       receiverId: targetUserId,
       senderName: profileController.currentUser.value.name,
       timestamp: DateTime.now().toString(),
-      readStatus: "unread",
+      readStatus: (auth.currentUser!.uid == targetUserId) ? "read" : "unread",
     );
 
     var roomDetails = ChatRoomModel(
@@ -128,6 +128,16 @@ class ChatController extends GetxController {
   }
 
   Stream<UserModel> getStatus(String uid) {
+    if (auth.currentUser!.uid == uid) {
+      return Stream.value(
+        UserModel(
+          id: uid,
+          name: profileController.currentUser.value.name,
+          profileImage: profileController.currentUser.value.profileImage,
+          status: "online", // Set status to online
+        ),
+      );
+    }
     return db.collection('users').doc(uid).snapshots().map(
       (event) {
         return UserModel.fromJson(event.data()!);

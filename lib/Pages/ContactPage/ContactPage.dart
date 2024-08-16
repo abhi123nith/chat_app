@@ -70,29 +70,29 @@ class ContactPage extends StatelessWidget {
             const SizedBox(height: 10),
             Obx(
               () => Column(
-                children: contactController.userList
-                    .map(
-                      (e) => InkWell(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () {
-                          Get.to(ChatPage(userModel: e));
-                        },
-                        child: ChatTile(
-                          imageUrl: e.profileImage != null &&
-                                  e.profileImage!.isNotEmpty
+                children: contactController.userList.map((e) {
+                  String roomId = chatController.getRoomId(e.id!);
+                  return InkWell(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      Get.to(ChatPage(userModel: e));
+                    },
+                    child: ChatTile(
+                      imageUrl:
+                          e.profileImage != null && e.profileImage!.isNotEmpty
                               ? e.profileImage ?? AssetsImage.defaultProfileUrl
                               : AssetsImage.defaultProfileUrl,
-                          name: e.name ?? "User",
-                          lastChat: e.about ?? "Hey there",
-                          lastTime: e.email ==
-                                  profileController.currentUser.value.email
+                      name: e.name ?? "User",
+                      lastChat: e.about ?? "Hey there",
+                      lastTime:
+                          e.email == profileController.currentUser.value.email
                               ? "You"
                               : "",
-                        ),
-                      ),
-                    )
-                    .toList(),
+                      roomId: roomId,
+                    ),
+                  );
+                }).toList(),
               ),
             )
           ],

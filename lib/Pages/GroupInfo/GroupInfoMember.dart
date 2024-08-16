@@ -1,35 +1,34 @@
-// ignore_for_file: unused_local_variable, sized_box_for_whitespace
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/Controller/GroupController.dart';
 import 'package:chat_app/Model/UserModel.dart';
+import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
-import '../../../Controller/ProfileController.dart';
 
 class GroupMemberInfo extends StatelessWidget {
   final String profileImage;
   final String userName;
   final String userEmail;
   final String groupId;
+  final UserModel? user; // Make user optional
 
-  const GroupMemberInfo(
-      {super.key,
-      required this.profileImage,
-      required this.userName,
-      required this.userEmail,
-      required this.groupId});
+  const GroupMemberInfo({
+    super.key,
+    required this.profileImage,
+    required this.userName,
+    required this.userEmail,
+    required this.groupId,
+    this.user, // Optional parameter
+  });
 
   @override
   Widget build(BuildContext context) {
-    ProfileController profileController = Get.put(ProfileController());
-    GroupController groupController = Get.put(GroupController());
+    final GroupController groupController = Get.find<GroupController>();
+
     return Container(
       padding: const EdgeInsets.all(20),
-      // height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Theme.of(context).colorScheme.primaryContainer,
@@ -42,18 +41,23 @@ class GroupMemberInfo extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 150,
                       height: 150,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: CachedNetworkImage(
-                          imageUrl: profileImage,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                      child: InkWell(
+                        onTap: () {
+                          Get.to(FullProfilePicUrl(imageUrl: profileImage));
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: CachedNetworkImage(
+                            imageUrl: profileImage,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
                         ),
                       ),
                     ),
@@ -82,84 +86,107 @@ class GroupMemberInfo extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Container(
-                      height: 50,
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      child: Row(children: [
-                        SvgPicture.asset(
-                          AssetsImage.profileAudioCall,
-                          width: 25,
+                    InkWell(
+                      onTap: () {},
+                      child: Container(
+                        height: 50,
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Theme.of(context).colorScheme.surface,
                         ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          "Call",
-                          style: TextStyle(
-                            color: Color(0xff039C00),
+                        child: Row(children: [
+                          SvgPicture.asset(
+                            AssetsImage.profileAudioCall,
+                            width: 25,
                           ),
-                        )
-                      ]),
-                    ),
-                    Container(
-                      height: 50,
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Theme.of(context).colorScheme.background,
+                          const SizedBox(width: 10),
+                          const Text(
+                            "Call",
+                            style: TextStyle(
+                              color: Color(0xff039C00),
+                            ),
+                          )
+                        ]),
                       ),
-                      child: Row(children: [
-                        SvgPicture.asset(
-                          AssetsImage.profileVideoCall,
-                          width: 25,
-                          color: const Color(0xffFF9900),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          "Video",
-                          style: TextStyle(
-                            color: Color(0xffFF9900),
-                          ),
-                        )
-                      ]),
                     ),
                     InkWell(
+                      onTap: () {},
+                      child: Container(
+                        height: 50,
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Theme.of(context).colorScheme.surface,
+                        ),
+                        child: Row(children: [
+                          SvgPicture.asset(
+                            AssetsImage.profileVideoCall,
+                            width: 25,
+                            color: const Color(0xffFF9900),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            "Video",
+                            style: TextStyle(
+                              color: Color(0xffFF9900),
+                            ),
+                          )
+                        ]),
+                      ),
+                    ),
+                    if (user !=
+                        null) // Only show the "Add" button if user is not null
+                      InkWell(
+                        onTap: () async {
+                          await groupController.addMemberToGroup(
+                              groupId, user!);
+                        },
+                        child: Container(
+                          height: 50,
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                          child: Row(children: [
+                            SvgPicture.asset(
+                              AssetsImage.groupAddUser,
+                              width: 25,
+                            ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              "Add",
+                            ),
+                          ]),
+                        ),
+                      ),
+                    InkWell(
                       onTap: () {
-                        var newMember = UserModel(
-                          email: "Nitish@gmail.com",
-                          name: "Nitish",
-                          profileImage: "",
-                          role: "admin",
-                        );
-
-                        groupController.addMemberToGroup(groupId, newMember);
+                        groupController.showEditGroupDialog(
+                            context, groupId, userName, userEmail);
                       },
                       child: Container(
                         height: 50,
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
-                          color: Theme.of(context).colorScheme.background,
+                          color: Theme.of(context).colorScheme.surface,
                         ),
-                        child: Row(children: [
-                          SvgPicture.asset(
-                            AssetsImage.groupAddUser,
-                            width: 25,
+                        child: const Row(children: [
+                          Icon(Icons.edit),
+                          SizedBox(width: 10),
+                          Text(
+                            "Edit",
                           ),
-                          const SizedBox(width: 10),
-                          const Text(
-                            "Add",
-                          )
                         ]),
                       ),
-                    )
+                    ),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

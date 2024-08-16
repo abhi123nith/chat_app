@@ -118,7 +118,7 @@ class GroupTitle extends StatelessWidget {
                               e.profileImage ?? AssetsImage.defaultProfileUrl,
                           name: e.name!,
                           lastChat: e.about ?? '',
-                          lastTime: ""),
+                          lastTime: "", roomId: '',),
                     )
                     .toList(),
               ),

@@ -13,6 +13,7 @@ import 'package:chat_app/Pages/CallPage/VideoCall.dart';
 import 'package:chat_app/Pages/Chat/Widgets/ChatBubble.dart';
 import 'package:chat_app/Pages/Chat/Widgets/TypeMessage.dart';
 import 'package:chat_app/Pages/UserProfile/userprofilenotedit.dart';
+import 'package:chat_app/Pages/UserProfile/viewfullProfileImage.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,15 +29,15 @@ class ChatPage extends StatelessWidget {
     TextEditingController messageController = TextEditingController();
     ProfileController profileController = Get.put(ProfileController());
     CallController callController = Get.put(CallController());
+
+    bool isSameUser = profileController.currentUser.value.id == userModel.id;
     return Scaffold(
       appBar: AppBar(
         leading: InkWell(
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           onTap: () {
-            Get.to(UserProfilePageWithoutEdit(
-              userModel: userModel,
-            ));
+            Get.to(FullProfilePic(userModel: userModel));
           },
           child: Padding(
             padding: const EdgeInsets.all(5),
@@ -70,59 +71,98 @@ class ChatPage extends StatelessWidget {
                 children: [
                   Text(userModel.name ?? "User",
                       style: Theme.of(context).textTheme.bodyLarge),
-                  StreamBuilder(
-                    stream: chatController.getStatus(userModel.id!),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Text("........");
-                      }
-                      if (!snapshot.hasData || snapshot.data!.status == null) {
-                        return const Text("Offline");
-                      } else {
-                        return Text(
-                          snapshot.data!.status ?? "",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: snapshot.data!.status == "Online"
-                                ? Colors.green
-                                : Colors.grey,
-                          ),
-                        );
-                      }
-                    },
-                  )
+                  isSameUser
+                      ? const Text(
+                          "Message yourself",
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        )
+                      : StreamBuilder(
+                          stream: chatController.getStatus(userModel.id!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text("........");
+                            }
+                            if (!snapshot.hasData ||
+                                snapshot.data!.status == null) {
+                              return const Text("Offline");
+                            }
+                            var userStatus = snapshot.data!;
+                            String status = userStatus.status ?? "Offline";
+
+                            if (status == "Online") {
+                              return Text(
+                                status,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.green,
+                                ),
+                              );
+                            } else {
+                              DateTime lastSeenTime;
+                              try {
+                                lastSeenTime =
+                                    userStatus.lastOnlineStatus != null
+                                        ? DateTime.parse(
+                                            userStatus.lastOnlineStatus!)
+                                        : DateTime.now();
+                              } catch (e) {
+                                lastSeenTime = DateTime.now();
+                              }
+
+                              Duration difference =
+                                  DateTime.now().difference(lastSeenTime);
+
+                              String formattedDate;
+                              if (difference.inHours < 12) {
+                                formattedDate =
+                                    "Last seen: ${DateFormat('hh:mm a').format(lastSeenTime)}";
+                              } else {
+                                formattedDate =
+                                    "Last seen: ${DateFormat('MMM d, yyyy').format(lastSeenTime)}";
+                              }
+
+                              return Text(
+                                formattedDate,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            }
+                          },
+                        )
                 ],
               ),
             ],
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              Get.to(AudioCallPage(target: userModel));
-              callController.callAction(
-                  userModel, profileController.currentUser.value, "audio");
-            },
-            icon: const Icon(
-              Icons.phone,
+          if (profileController.currentUser.value.id != userModel.id) ...[
+            IconButton(
+              onPressed: () {
+                Get.to(AudioCallPage(target: userModel));
+                callController.callAction(
+                    userModel, profileController.currentUser.value, "audio");
+              },
+              icon: const Icon(
+                Icons.phone,
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              
-              Get.to(VideoCallPage(target: userModel));
-              callController.callAction(
-                userModel,
-                profileController.currentUser.value,
-                "video",
-              );
-            },
-            icon: const Icon(
-              Icons.video_call,
-            ),
-            
-          )
-          
+            IconButton(
+              onPressed: () {
+                Get.to(VideoCallPage(target: userModel));
+                callController.callAction(
+                  userModel,
+                  profileController.currentUser.value,
+                  "video",
+                );
+              },
+              icon: const Icon(
+                Icons.video_call,
+              ),
+            )
+          ],
         ],
       ),
       body: Padding(

@@ -38,6 +38,8 @@ class UserProfilePage extends StatelessWidget {
                   userModel.profileImage ?? AssetsImage.defaultProfileUrl,
               userName: userModel.name ?? "User",
               userEmail: userModel.email ?? "",
+              userModel: userModel,
+              userAbout: userModel.about ?? "Hii , I am using Sampark",
             ),
             const Spacer(),
             ElevatedButton(

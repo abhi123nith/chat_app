@@ -2,7 +2,7 @@ import 'package:chat_app/Model/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-
+import 'package:intl/intl.dart';
 
 class AuthController extends GetxController {
   final auth = FirebaseAuth.instance;
@@ -59,10 +59,13 @@ class AuthController extends GetxController {
   }
 
   Future<void> initUser(String email, String name) async {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd-MM-yyyy').format(now);
     var newUser = UserModel(
       email: email,
       name: name,
       id: auth.currentUser!.uid,
+      createdAt: formattedDate,
     );
 
     try {

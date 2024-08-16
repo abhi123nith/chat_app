@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/Controller/ChatController.dart';
+import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,14 +11,17 @@ class ChatTile extends StatelessWidget {
   final String name;
   final String lastChat;
   final String lastTime;
-  final String unReadMessageCount;
-  const ChatTile(
-      {super.key,
-      required this.imageUrl,
-      required this.name,
-      required this.lastChat,
-      required this.lastTime,
-      this.unReadMessageCount = "0"});
+  final String roomId;
+  final int unreadCount;
+  const ChatTile({
+    super.key,
+    required this.imageUrl,
+    required this.name,
+    required this.lastChat,
+    required this.lastTime,
+    required this.roomId,
+    this.unreadCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,17 +42,24 @@ class ChatTile extends StatelessWidget {
                 Container(
                   height: 70,
                   width: 70,
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: CachedNetworkImage(
+                  child: InkWell(
+                    onTap: () {
+                      Get.to(FullProfilePicUrl(
                         imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        width: 70,
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      )),
+                      ));
+                    },
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          width: 70,
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        )),
+                  ),
                 ),
                 const SizedBox(width: 15),
                 Expanded(
@@ -101,6 +112,26 @@ class ChatTile extends StatelessWidget {
               //     );
               //   },
               // ),
+              if (unreadCount > 0)
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  child: Center(
+                    child: Text(
+                      unreadCount.toString(),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onBackground,
+                          ),
+                    ),
+                  ),
+                ),
+              const SizedBox(
+                height: 5,
+              ),
               Text(
                 lastTime,
                 style: Theme.of(context).textTheme.labelMedium,
