@@ -390,6 +390,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_logs:
     dependency: transitive
     description:
@@ -406,6 +411,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.21"
+  flutter_styled_toast:
+    dependency: transitive
+    description:
+      name: flutter_styled_toast
+      sha256: e667f13a665820eb0fa8506547e47eacbcddf1948d6d3036cfd3b089bd4b0516
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -1181,6 +1194,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.9.0"
+  zego_uikit_prebuilt_live_streaming:
+    dependency: "direct main"
+    description:
+      name: zego_uikit_prebuilt_live_streaming
+      sha256: be118b2eb1f1ad3b9900bda78ba4295bd8d6c950668392c697a367e35f22b80a
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.5.4"
   zego_uikit_signaling_plugin:
     dependency: "direct main"
     description:

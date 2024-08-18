@@ -9,6 +9,7 @@ import 'package:chat_app/Widget/PrimaryButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -25,8 +26,8 @@ class ProfilePage extends StatelessWidget {
         text: profileController.currentUser.value.phoneNumber);
     TextEditingController about =
         TextEditingController(text: profileController.currentUser.value.about);
-    ImagePickerController imagePickerController =
-        Get.put(ImagePickerController());
+    ImagePickerController imagePickerController = ImagePickerController();
+    Get.put(ImagePickerController());
     RxString imagePath = "".obs;
 
     AuthController authController = Get.put(AuthController());
@@ -68,10 +69,10 @@ class ProfilePage extends StatelessWidget {
                                       splashColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        // imagePath.value =
-                                        //     await imagePickerController
-                                        //         .pickImage(ImageSource.gallery);
-                                        // print("Image Picked${imagePath.value}");
+                                        imagePath.value =
+                                            await imagePickerController
+                                                .pickImage(ImageSource.gallery);
+                                        print("Image Picked${imagePath.value}");
                                       },
                                       child: Container(
                                         height: 200,

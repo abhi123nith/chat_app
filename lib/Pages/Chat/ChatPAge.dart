@@ -188,7 +188,7 @@ class ChatPage extends StatelessWidget {
                           child: Text("Error: ${snapshot.error}"),
                         );
                       }
-                      if (snapshot.data == null) {
+                      if (snapshot.data == null || snapshot.data!.isEmpty) {
                         return const Center(
                           child: Text("No Messages"),
                         );
@@ -216,7 +216,7 @@ class ChatPage extends StatelessWidget {
                     },
                   ),
                   Obx(
-                    () => (chatController.selectedImagePath.value != "")
+                    () => (chatController.selectedImagePath.value.isNotEmpty)
                         ? Positioned(
                             bottom: 0,
                             left: 0,

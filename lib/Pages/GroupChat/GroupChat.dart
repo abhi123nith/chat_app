@@ -70,7 +70,7 @@ class GroupChatPage extends StatelessWidget {
                   Text(groupModel.name ?? "Group Name",
                       style: Theme.of(context).textTheme.bodyLarge),
                   Text(
-                    "Online",
+                    "tap here for group info",
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ],
@@ -80,7 +80,9 @@ class GroupChatPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              //    Get.to(GroupAudioCallPage(target: ))
+            },
             icon: const Icon(
               Icons.phone,
             ),

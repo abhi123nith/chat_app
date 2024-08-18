@@ -13,6 +13,7 @@ class ChatTile extends StatelessWidget {
   final String lastTime;
   final String roomId;
   final int unreadCount;
+
   const ChatTile({
     super.key,
     required this.imageUrl,
@@ -26,6 +27,7 @@ class ChatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ChatController chatController = Get.put(ChatController());
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(10),
@@ -114,21 +116,29 @@ class ChatTile extends StatelessWidget {
               // ),
               if (unreadCount > 0)
                 Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  child: Center(
-                    child: Text(
-                      unreadCount.toString(),
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onBackground,
-                          ),
-                    ),
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.green, // Green dot
                   ),
                 ),
+              // Container(
+              //   width: 20,
+              //   height: 20,
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(100),
+              //     color: Theme.of(context).colorScheme.primary,
+              //   ),
+              //   child: Center(
+              //     child: Text(
+              //       unreadCount.toString(),
+              //       style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              //             color: Theme.of(context).colorScheme.onBackground,
+              //           ),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(
                 height: 5,
               ),

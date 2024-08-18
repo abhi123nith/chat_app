@@ -5,20 +5,21 @@ import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-
 class ChatBubble extends StatelessWidget {
   final String message;
   final bool isComming;
   final String time;
   final String status;
   final String imageUrl;
-  const ChatBubble(
-      {super.key,
-      required this.message,
-      required this.isComming,
-      required this.time,
-      required this.status,
-      required this.imageUrl});
+  
+  const ChatBubble({
+    super.key,
+    required this.message,
+    required this.isComming,
+    required this.time,
+    required this.status,
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +66,9 @@ class ChatBubble extends StatelessWidget {
                                 const Icon(Icons.error),
                           ),
                         ),
-                        message == "" ? Container() : const SizedBox(height: 10),
+                        message == ""
+                            ? Container()
+                            : const SizedBox(height: 10),
                         message == "" ? Container() : Text(message),
                       ],
                     )),

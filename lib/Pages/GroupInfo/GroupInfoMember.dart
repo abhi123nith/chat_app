@@ -135,8 +135,7 @@ class GroupMemberInfo extends StatelessWidget {
                         ]),
                       ),
                     ),
-                    if (user !=
-                        null) // Only show the "Add" button if user is not null
+                    if (user != null)
                       InkWell(
                         onTap: () async {
                           await groupController.addMemberToGroup(

@@ -37,6 +37,27 @@ class ContactController extends GetxController {
     isLoading.value = false;
   }
 
+  Future<void> addNewContact({
+    required String name,
+    required String email,
+    required String mobile,
+  }) async {
+    try {
+      // Assuming that email is unique
+      await db.collection('users').add({
+        'name': name,
+        'email': email,
+        'mobile': mobile,
+        'profileImage': '', // Optional field
+        'status': 'offline',
+        'createdAt': DateTime.now().toString(),
+      });
+      Get.snackbar('Success', 'Contact added successfully');
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to add contact');
+    }
+  }
+
   Stream<List<ChatRoomModel>> getChatRoom() {
     return db
         .collection('chats')

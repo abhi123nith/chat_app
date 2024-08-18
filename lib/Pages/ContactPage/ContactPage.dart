@@ -1,12 +1,10 @@
-// ignore_for_file: unused_local_variable
-
-import 'package:chat_app/Controller/ChatController.dart';
 import 'package:chat_app/Controller/ContactController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
 import 'package:chat_app/Pages/Chat/ChatPAge.dart';
 import 'package:chat_app/Pages/ContactPage/Widgets/ContactSearch.dart';
 import 'package:chat_app/Pages/ContactPage/Widgets/NewContactTile.dart';
 import 'package:chat_app/Pages/Groups/NewGroup/NewGroup.dart';
+import 'package:chat_app/Pages/Live/live_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,7 +19,9 @@ class ContactPage extends StatelessWidget {
     RxBool isSearchEnable = false.obs;
     ContactController contactController = Get.put(ContactController());
     ProfileController profileController = Get.put(ProfileController());
-    ChatController chatController = Get.put(ChatController());
+
+    // UserModel userModel = UserModel();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Select contact"),
@@ -49,9 +49,25 @@ class ContactPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             NewContactTile(
-              btnName: "New contact",
-              icon: Icons.person_add,
-              ontap: () {},
+              btnName: "LiveStreaming",
+              icon: Icons.live_tv_outlined,
+              ontap: () {
+                //  var liveId = profileController.currentUser.value.liveid ?? '';
+              //  final liveId = profileController.currentUser.value.liveid;
+
+                // if (liveId == null || liveId.isEmpty) {
+                //   // Handle missing liveId case
+                //   Get.snackbar(
+                //     'Error',
+                //     'Live ID is missing',
+                //     snackPosition: SnackPosition.BOTTOM,
+                //   );
+                //   return;
+                // }
+                Get.to(HomeLivePage(
+                  liveID: 'testlived',
+                ));
+              },
             ),
             const SizedBox(height: 10),
             NewContactTile(
@@ -70,29 +86,30 @@ class ContactPage extends StatelessWidget {
             const SizedBox(height: 10),
             Obx(
               () => Column(
-                children: contactController.userList.map((e) {
-                  String roomId = chatController.getRoomId(e.id!);
-                  return InkWell(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      Get.to(ChatPage(userModel: e));
-                    },
-                    child: ChatTile(
-                      imageUrl:
-                          e.profileImage != null && e.profileImage!.isNotEmpty
-                              ? e.profileImage ?? AssetsImage.defaultProfileUrl
+                children: contactController.userList
+                    .map(
+                      (e) => InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () {
+                          Get.to(ChatPage(userModel: e));
+                        },
+                        child: ChatTile(
+                          imageUrl: (e.profileImage?.isNotEmpty ?? false)
+                              ? e.profileImage!
                               : AssetsImage.defaultProfileUrl,
-                      name: e.name ?? "User",
-                      lastChat: e.about ?? "Hey there",
-                      lastTime:
-                          e.email == profileController.currentUser.value.email
+                          name: e.name ?? "User",
+                          lastChat: e.about ?? "Hey there",
+                          lastTime: e.email ==
+                                  profileController.currentUser.value.email
                               ? "You"
                               : "",
-                      roomId: roomId,
-                    ),
-                  );
-                }).toList(),
+                          roomId:
+                              '', // You may want to handle this appropriately
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             )
           ],

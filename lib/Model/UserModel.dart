@@ -11,6 +11,7 @@ class UserModel {
   String? lastOnlineStatus;
   String? status;
   String? role;
+  String? liveid;
 
   UserModel({
     this.id,
@@ -50,6 +51,7 @@ class UserModel {
     _data["LastOnlineStatus"] = lastOnlineStatus;
     _data["Status"] = status;
     _data["role"] = role;
+
     return _data;
   }
 }

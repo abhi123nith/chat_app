@@ -161,9 +161,7 @@ class ChatController extends GetxController {
         );
   }
 
-  Stream<int> getUnreadMessageCount(
-    String roomId,
-  ) {
+  Stream<int> getUnreadMessageCount(String roomId) {
     return db
         .collection("chats")
         .doc(roomId)
@@ -171,7 +169,11 @@ class ChatController extends GetxController {
         .where("readStatus", isEqualTo: "unread")
         .where("senderId", isNotEqualTo: profileController.currentUser.value.id)
         .snapshots()
-        .map((snapshot) => snapshot.docs.length);
+        .map((snapshot) {
+      int count = snapshot.docs.length;
+      print('Unread count for room $roomId: $count'); // Debugging line
+      return count;
+    });
   }
 
   Future<void> markMessagesAsRead(String roomId) async {
