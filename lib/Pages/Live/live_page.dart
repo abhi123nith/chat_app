@@ -17,7 +17,7 @@ class HomeLivePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                Get.to(LivePage(
+                Get.to(const LivePage(
                   isHost: true,
                   // liveId: liveID,
                 ));

@@ -1,10 +1,8 @@
 import 'package:chat_app/Controller/ContactController.dart';
-import 'package:chat_app/Controller/ProfileController.dart';
-import 'package:chat_app/Pages/Chat/ChatPAge.dart';
-import 'package:chat_app/Pages/ContactPage/Widgets/ContactSearch.dart';
+import 'package:chat_app/Pages/Chat/ChatPage.dart';
 import 'package:chat_app/Pages/ContactPage/Widgets/NewContactTile.dart';
 import 'package:chat_app/Pages/Groups/NewGroup/NewGroup.dart';
-import 'package:chat_app/Pages/Live/live_page.dart';
+import 'package:chat_app/Pages/Home/Widget/userSearchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,102 +15,114 @@ class ContactPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RxBool isSearchEnable = false.obs;
-    ContactController contactController = Get.put(ContactController());
-    ProfileController profileController = Get.put(ProfileController());
+    final TextEditingController searchController = TextEditingController();
 
-    // UserModel userModel = UserModel();
+    ContactController contactController = Get.put(ContactController());
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Select contact"),
+        title:
+         Obx(() => isSearchEnable.value
+            ? UserSearchBar(
+                searchController: searchController,
+                onChanged: contactController.searchUsers,
+              )
+            : const Text("Select contact")),
         actions: [
           Obx(
             () => IconButton(
               onPressed: () {
                 isSearchEnable.value = !isSearchEnable.value;
+                if (!isSearchEnable.value) {
+                  searchController.clear();
+                  contactController.searchUsers('');
+                }
               },
-              icon: isSearchEnable.value
-                  ? const Icon(Icons.close)
-                  : const Icon(Icons.search),
+              icon: Icon(isSearchEnable.value ? Icons.close : Icons.search),
             ),
-          )
+          ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child: ListView(
-          children: [
-            Obx(
-              () => isSearchEnable.value
-                  ? const ContactSearch()
-                  : const SizedBox(),
-            ),
-            const SizedBox(height: 10),
-            NewContactTile(
-              btnName: "LiveStreaming",
-              icon: Icons.live_tv_outlined,
-              ontap: () {
-                //  var liveId = profileController.currentUser.value.liveid ?? '';
-              //  final liveId = profileController.currentUser.value.liveid;
-
-                // if (liveId == null || liveId.isEmpty) {
-                //   // Handle missing liveId case
-                //   Get.snackbar(
-                //     'Error',
-                //     'Live ID is missing',
-                //     snackPosition: SnackPosition.BOTTOM,
-                //   );
-                //   return;
-                // }
-                Get.to(HomeLivePage(
-                  liveID: 'testlived',
-                ));
-              },
-            ),
-            const SizedBox(height: 10),
-            NewContactTile(
-              btnName: "New Group",
-              icon: Icons.group_add,
-              ontap: () {
-                Get.to(const NewGroup());
-              },
-            ),
-            const SizedBox(height: 10),
-            const Row(
-              children: [
-                Text("Contacts on Sampark"),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Obx(
-              () => Column(
-                children: contactController.userList
-                    .map(
-                      (e) => InkWell(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
+        child:
+         Obx(
+          () => 
+          isSearchEnable.value
+              ? Expanded(
+                  child: ListView.separated(
+                    itemCount: contactController.filteredUserList.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      var user = contactController.filteredUserList[index];
+                      return InkWell(
                         onTap: () {
-                          Get.to(ChatPage(userModel: e));
+                          Get.to(ChatPage(userModel: user));
                         },
                         child: ChatTile(
-                          imageUrl: (e.profileImage?.isNotEmpty ?? false)
-                              ? e.profileImage!
+                          imageUrl: user.profileImage?.isNotEmpty == true
+                              ? user.profileImage!
                               : AssetsImage.defaultProfileUrl,
-                          name: e.name ?? "User",
-                          lastChat: e.about ?? "Hey there",
-                          lastTime: e.email ==
-                                  profileController.currentUser.value.email
-                              ? "You"
-                              : "",
-                          roomId:
-                              '', // You may want to handle this appropriately
+                          name: user.name ?? 'User',
+                          lastChat: user.about ?? 'Hey there!',
+                          lastTime:
+                              '', // Update this according to your requirements
+                          roomId: '', // Handle this appropriately
                         ),
+                      );
+                    },
+                  ),
+                )
+              : Column(
+                  children: [
+                    NewContactTile(
+                      btnName: "New Group",
+                      icon: Icons.group_add,
+                      ontap: () {
+                        Get.to(const NewGroup());
+                      },
+                    ),
+                    
+                    const SizedBox(height: 10),
+                  
+                    const Row(
+                      children: [
+                        Text("Contacts on Sampark"),
+                      ],
+                    ),
+                   
+                    const SizedBox(height: 10),
+                  
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: contactController.userList.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          var user = contactController.userList[index];
+                          return InkWell(
+                            onTap: () {
+                              Get.to(ChatPage(userModel: user));
+                            },
+                            child: ChatTile(
+                              imageUrl: user.profileImage?.isNotEmpty == true
+                                  ? user.profileImage!
+                                  : AssetsImage.defaultProfileUrl,
+                              name: user.name ?? 'User',
+                              lastChat: user.about == ""
+                                  ? 'Hey, I am using Sampark App!'
+                                  : user.about!,
+                              lastTime:
+                                  '', // Update this according to your requirements
+                              roomId: '', // Handle this appropriately
+                            ),
+                          );
+                        },
                       ),
-                    )
-                    .toList(),
-              ),
-            )
-          ],
+                    ),
+                  ],
+                ),
         ),
       ),
     );

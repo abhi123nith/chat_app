@@ -110,6 +110,91 @@ class ChatController extends GetxController {
     isLoading.value = false;
   }
 
+Future<void> sendGroupMessage(
+  String groupId, 
+  String message,
+  {String? imageUrl}
+) async {
+  isLoading.value = true;
+  String chatId = uuid.v6();
+  DateTime timestamp = DateTime.now();
+  String nowTime = DateFormat('hh:mm a').format(timestamp);
+
+  // Fetch group members
+  List<String> groupMembers = await _fetchGroupMembers(groupId);
+
+  // Initialize readBy list with group members
+  List<String> readBy = List<String>.from(groupMembers);
+
+  var newChat = ChatModel(
+    id: chatId,
+    message: message,
+    senderId: auth.currentUser!.uid,
+    receiverId: groupId, // Use group ID for group messages
+    senderName: profileController.currentUser.value.name,
+    timestamp: DateTime.now().toString(),
+    readStatus: "unread",
+    readBy: readBy, // Initialize readBy with group members
+    imageUrl: imageUrl, // Optional
+  );
+
+  var roomDetails = ChatRoomModel(
+    id: groupId,
+    lastMessage: message,
+    lastMessageTimestamp: nowTime,
+    sender: profileController.currentUser.value,
+    receiver: null, // Not applicable for group messages
+    timestamp: DateTime.now().toString(),
+    unReadMessNo: 0,
+  );
+
+  try {
+    await db.collection("chats").doc(groupId).collection("messages").doc(chatId).set(newChat.toJson());
+    await db.collection("chats").doc(groupId).set(roomDetails.toJson());
+  } catch (e) {
+    print(e);
+  }
+  isLoading.value = false;
+}
+
+Future<List<String>> _fetchGroupMembers(String groupId) async {
+  DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await db.collection("groups").doc(groupId).get();
+  if (groupSnapshot.exists) {
+    List<dynamic> members = groupSnapshot.data()?["members"] ?? [];
+    return List<String>.from(members);
+  }
+  return [];
+}
+
+Future<void> markGroupMessagesAsRead(String groupId) async {
+  QuerySnapshot<Map<String, dynamic>> messagesSnapshot = await db
+      .collection("chats")
+      .doc(groupId)
+      .collection("messages")
+      .where("readStatus", isEqualTo: "unread")
+      .get();
+
+  String currentUserId = profileController.currentUser.value.id!;
+
+  for (QueryDocumentSnapshot<Map<String, dynamic>> messageDoc in messagesSnapshot.docs) {
+    Map<String, dynamic> data = messageDoc.data();
+    List<String> existingReadBy = List<String>.from(data["readBy"] ?? []);
+
+    if (!existingReadBy.contains(currentUserId)) {
+      // Update readBy list for group messages
+      existingReadBy.add(currentUserId);
+
+      await db
+          .collection("chats")
+          .doc(groupId)
+          .collection("messages")
+          .doc(messageDoc.id)
+          .update({"readBy": existingReadBy});
+    }
+  }
+}
+
+
   Stream<List<ChatModel>> getMessages(String targetUserId) {
     String roomId = getRoomId(targetUserId);
     return db

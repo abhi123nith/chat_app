@@ -1202,6 +1202,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.5.4"
+  zego_uikit_prebuilt_video_conference:
+    dependency: "direct main"
+    description:
+      name: zego_uikit_prebuilt_video_conference
+      sha256: a41694f925e791c5c70f0524c2ea6006e1e89215ba4a4fe428c2e9a13f71f781
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.4"
   zego_uikit_signaling_plugin:
     dependency: "direct main"
     description:

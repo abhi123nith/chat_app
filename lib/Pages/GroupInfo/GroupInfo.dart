@@ -1,18 +1,28 @@
+// ignore_for_file: library_private_types_in_public_api
+
+import 'package:chat_app/Controller/GroupController.dart';
 import 'package:chat_app/Model/GroupModel.dart';
 import 'package:chat_app/Model/UserModel.dart';
-import 'package:chat_app/Pages/Chat/ChatPage.dart';
+import 'package:chat_app/Pages/Chat/ChatPAge.dart';
 import 'package:chat_app/Pages/GroupInfo/GroupInfoMember.dart';
 import 'package:chat_app/Pages/Home/Widget/ChatTile.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart'; // Import intl package for date formatting
+import 'package:intl/intl.dart';
 
-class GroupInfo extends StatelessWidget {
+class GroupInfo extends StatefulWidget {
   final GroupModel groupModel;
 
   const GroupInfo({super.key, required this.groupModel});
+
+  @override
+  _GroupInfoState createState() => _GroupInfoState();
+}
+
+class _GroupInfoState extends State<GroupInfo> {
+  final GroupController groupController = Get.put(GroupController());
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +31,21 @@ class GroupInfo extends StatelessWidget {
     String formattedDate = DateFormat('dd MMM yyyy').format(date);
 
     // Sort members: Admins first, then regular users
-    List<UserModel> sortedMembers = groupModel.members!
+    List<UserModel> sortedMembers = widget.groupModel.members!
         .where((member) => member.role == 'admin')
         .toList()
       ..addAll(
-        groupModel.members!.where((member) => member.role != 'admin').toList(),
+        widget.groupModel.members!
+            .where((member) => member.role != 'admin')
+            .toList(),
       );
+    widget.groupModel.members!
+        .where((member) => member.role != 'admin')
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(groupModel.name!),
+        title: Text(widget.groupModel.name!),
         actions: [
           IconButton(
             onPressed: () {
@@ -58,19 +73,42 @@ class GroupInfo extends StatelessWidget {
             return ListView(
               children: [
                 GroupMemberInfo(
-                  //user: user,
-                  groupId: groupModel.id!,
-                  profileImage: groupModel.profileUrl == ""
+                  groupId: widget.groupModel.id!,
+                  profileImage: widget.groupModel.profileUrl == ""
                       ? AssetsImage.defaultProfileUrl
-                      : groupModel.profileUrl!,
-                  userName: groupModel.name!,
-                  userEmail:
-                      groupModel.description ?? "No Description Available",
+                      : widget.groupModel.profileUrl!,
+                  userName: widget.groupModel.name!,
+                  userEmail: widget.groupModel.description ??
+                      "No Description Available",
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  "Members",
-                  style: Theme.of(context).textTheme.labelLarge,
+                Row(
+                  children: [
+                    Text(
+                      "Members",
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            _showAddMemberDialog(context);
+                          },
+                          icon: const Icon(Icons.group_add),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _showRemoveMemberDialog(context);
+                          },
+                          icon: const Icon(Icons.group_remove),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    )
+                  ],
                 ),
                 const SizedBox(height: 10),
                 Column(
@@ -87,7 +125,7 @@ class GroupInfo extends StatelessWidget {
                             name: member.name!,
                             lastChat: member.email!,
                             lastTime: member.role == "admin" ? "Admin" : "User",
-                            roomId: groupModel.id!,
+                            roomId: widget.groupModel.id!,
                           ),
                         ),
                       )
@@ -144,19 +182,15 @@ class GroupInfo extends StatelessWidget {
   }
 
   void _deleteGroup() async {
-    // Implement your logic to delete the group from the database.
     await FirebaseFirestore.instance
         .collection('groups')
-        .doc(groupModel.id)
+        .doc(widget.groupModel.id)
         .delete();
 
-    // Navigate back to the previous screen or home page
     Get.back();
   }
 
   void _navigateToChatPage(BuildContext context, UserModel member) {
-    // Example function to navigate to the chat page
-    // Replace `ChatPage` with the actual page you want to navigate to
     Get.to(() => ChatPage(
           userModel: member,
         ));
@@ -165,7 +199,7 @@ class GroupInfo extends StatelessWidget {
   Future<UserModel> _fetchCreator() async {
     final userDoc = await FirebaseFirestore.instance
         .collection('users')
-        .doc(groupModel.createdBy)
+        .doc(widget.groupModel.createdBy)
         .get();
     final userData = userDoc.data();
     if (userData != null) {
@@ -173,5 +207,122 @@ class GroupInfo extends StatelessWidget {
     } else {
       throw Exception("Creator not found");
     }
+  }
+
+  void _showAddMemberDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Add Members to the Group"),
+          content: SizedBox(
+            width: 300,
+            child: StreamBuilder<List<UserModel>>(
+              stream: groupController.getAllUsers(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("No users found"));
+                }
+
+                final allUsers = snapshot.data!;
+                final groupMemberIds =
+                    widget.groupModel.members!.map((e) => e.id).toList();
+
+                // Filter out users who are already in the group
+                final usersToAdd = allUsers
+                    .where((user) => !groupMemberIds.contains(user.id))
+                    .toList();
+
+                if (usersToAdd.isEmpty) {
+                  return const Center(
+                      child: Text("All users are already in the group"));
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: usersToAdd.length,
+                  itemBuilder: (context, index) {
+                    final user = usersToAdd[index];
+                    return InkWell(
+                      onTap: () async {
+                        groupController.addMemberToGroup(
+                            widget.groupModel.id!, user);
+                        setState(() {
+                          widget.groupModel.members!.add(user);
+                        });
+                        Get.back(); // Close the dialog
+                        Get.snackbar(
+                            backgroundColor: Colors.green,
+                            "Success",
+                            "${user.name} added to the group");
+                      },
+                      child: ChatTile(
+                        imageUrl:
+                            user.profileImage ?? AssetsImage.defaultProfileUrl,
+                        name: user.name!,
+                        lastChat: user.email!,
+                        lastTime: "",
+                        roomId: '',
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRemoveMemberDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final nonAdminMembers = widget.groupModel.members!
+            .where((member) => member.role != 'admin')
+            .toList();
+        return AlertDialog(
+          title: const Text("Remove Member"),
+          content: SizedBox(
+            width: 300,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: nonAdminMembers.length,
+              itemBuilder: (context, index) {
+                final member = nonAdminMembers[index];
+                return InkWell(
+                  onTap: () async {
+                    groupController.removeMemberFromGroup(
+                        widget.groupModel.id!, member);
+                    setState(() {
+                      widget.groupModel.members!.remove(member);
+                    });
+
+                    Get.back(); // Close the dialog
+                    Get.snackbar(
+                        backgroundColor: Colors.green,
+                        "Success",
+                        "${member.name} removed from the group");
+                  },
+                  child: ChatTile(
+                    imageUrl:
+                        member.profileImage ?? AssetsImage.defaultProfileUrl,
+                    name: member.name!,
+                    lastChat: member.email!,
+                    lastTime: member.role == "admin" ? "Admin" : "User",
+                    roomId: '',
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 }

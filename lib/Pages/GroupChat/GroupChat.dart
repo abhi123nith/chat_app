@@ -1,14 +1,19 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables
+
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app/Controller/GroupCallController.dart'; // Ensure this import
 import 'package:chat_app/Controller/GroupController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
+import 'package:chat_app/Model/ChatMode.dart';
 import 'package:chat_app/Model/GroupModel.dart';
 import 'package:chat_app/Pages/Chat/Widgets/ChatBubble.dart';
 import 'package:chat_app/Pages/GroupChat/GroupTypeMessage.dart';
 import 'package:chat_app/Pages/GroupInfo/GroupInfo.dart';
 import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:chat_app/config/Images.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -20,36 +25,33 @@ class GroupChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GroupController groupController = Get.put(GroupController());
-    final ProfileController profileController = Get.put(ProfileController());
+    final GroupCallController groupCallController =
+        Get.put(GroupCallController()); // Get the controller
+    final GroupController groupController =
+        Get.find<GroupController>(); // Adjust if necessary
+    final ProfileController profileController =
+        Get.find<ProfileController>(); // Adjust if necessary
 
     return Scaffold(
       appBar: AppBar(
-        leading: InkWell(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          onTap: () {
-            // Add functionality if needed
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: GestureDetector(
-              onTap: () => FullProfilePicUrl(
+        leading: Padding(
+          padding: const EdgeInsets.all(5),
+          child: GestureDetector(
+            onTap: () => FullProfilePicUrl(
+              imageUrl: groupModel.profileUrl == ""
+                  ? AssetsImage.defaultProfileUrl
+                  : groupModel.profileUrl!,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: CachedNetworkImage(
                 imageUrl: groupModel.profileUrl == ""
                     ? AssetsImage.defaultProfileUrl
                     : groupModel.profileUrl!,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: CachedNetworkImage(
-                  imageUrl: groupModel.profileUrl == ""
-                      ? AssetsImage.defaultProfileUrl
-                      : groupModel.profileUrl!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),
           ),
@@ -80,9 +82,7 @@ class GroupChatPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              //    Get.to(GroupAudioCallPage(target: ))
-            },
+            onPressed: () {},
             icon: const Icon(
               Icons.phone,
             ),
@@ -103,7 +103,7 @@ class GroupChatPage extends StatelessWidget {
             Expanded(
               child: Stack(
                 children: [
-                  StreamBuilder(
+                  StreamBuilder<List<ChatModel>>(
                     stream: groupController.getGroupMessages(groupModel.id!),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -129,13 +129,16 @@ class GroupChatPage extends StatelessWidget {
                                 snapshot.data![index].timestamp!);
                             String formattedTime =
                                 DateFormat('hh:mm a').format(timestamp);
+
                             return ChatBubble(
                               message: snapshot.data![index].message!,
                               imageUrl: snapshot.data![index].imageUrl ?? "",
                               isComming: snapshot.data![index].senderId !=
                                   profileController.currentUser.value.id,
-                              status: "read",
                               time: formattedTime,
+                              status: groupController
+                                  .markGMessagesAsRead(groupModel.id!)
+                                  .toString(),
                             );
                           },
                         );
@@ -192,5 +195,26 @@ class GroupChatPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<String> getUserIds() {
+    List<String> userIds = [];
+
+    FirebaseFirestore.instance
+        .collection('groups') // Your Firestore collection for groups
+        .doc(groupModel.id) // Document ID for the specific group
+        .get()
+        .then((DocumentSnapshot groupDoc) {
+      if (groupDoc.exists) {
+        List<dynamic> members = groupDoc.get('members');
+        userIds = members.map((memberId) => memberId.toString()).toList();
+      } else {
+        print('Group document does not exist');
+      }
+    }).catchError((error) {
+      print('Error fetching user IDs: $error');
+    });
+
+    return userIds;
   }
 }

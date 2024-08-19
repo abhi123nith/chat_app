@@ -54,6 +54,7 @@ dependencies:
   url_launcher: ^6.2.5
   zego_uikit: 2.22.2 
   zego_uikit_prebuilt_live_streaming: ^3.5.4
+  zego_uikit_prebuilt_video_conference: ^2.7.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

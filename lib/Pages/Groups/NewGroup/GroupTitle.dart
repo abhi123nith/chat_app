@@ -114,11 +114,16 @@ class GroupTitle extends StatelessWidget {
                 children: groupController.groupMembers
                     .map(
                       (e) => ChatTile(
-                          imageUrl:
-                              e.profileImage ?? AssetsImage.defaultProfileUrl,
-                          name: e.name!,
-                          lastChat: e.about ?? '',
-                          lastTime: "", roomId: '',),
+                        imageUrl:
+                            e.profileImage ?? AssetsImage.defaultProfileUrl,
+                        name: e.name!,
+                        lastChat: e.about == ""
+                            ? "Hey, I am using Sampark App!"
+                            : e.about!,
+                        lastTime: e.role ?? "User",
+                        roomId: '',
+                        role: e.role ?? "User", // Add role here
+                      ),
                     )
                     .toList(),
               ),

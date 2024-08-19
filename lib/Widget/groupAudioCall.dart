@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
-class GroupAudioCallPage extends StatelessWidget {
+class AudioCallPage extends StatelessWidget {
   final UserModel target;
-  const GroupAudioCallPage({super.key, required this.target});
+  const AudioCallPage({super.key, required this.target});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +21,8 @@ class GroupAudioCallPage extends StatelessWidget {
       userID: profileController.currentUser.value.id ?? "root",
       userName: profileController.currentUser.value.name ?? "root",
       callID: callId,
-      config: ZegoUIKitPrebuiltCallConfig.groupVoiceCall(),
+      config: ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall(),
     );
   }
 }
 
-
-// 123

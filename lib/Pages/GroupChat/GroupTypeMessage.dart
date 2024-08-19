@@ -77,7 +77,7 @@ class GroupTypeMessage extends StatelessWidget {
                     splashColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () {
-                      groupController.sendGroupMessage(
+                      groupController.sendGMessage(
                         messageController.text,
                         groupModel.id!,
                         "",

@@ -69,7 +69,10 @@ class ChatList extends StatelessWidget {
                         AssetsImage.defaultProfileUrl,
                     name: userModel.name ?? 'User',
                     lastChat: chatRoom.lastMessage ?? 'Last Message',
-                    lastTime: chatRoom.lastMessageTimestamp ?? 'Last Time',
+                    lastTime:
+                        profileController.currentUser.value.id == userModel.id
+                            ? "You"
+                            : chatRoom.lastMessageTimestamp ?? 'Last Time',
                     roomId: roomId,
                     unreadCount: unreadCount, // Pass unread count to ChatTile
                   );

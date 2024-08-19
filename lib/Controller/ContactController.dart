@@ -11,11 +11,26 @@ class ContactController extends GetxController {
   final db = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   RxBool isLoading = false.obs;
+
+  RxList<UserModel> filteredUserList = <UserModel>[].obs;
   RxList<UserModel> userList = <UserModel>[].obs;
   RxList<ChatRoomModel> chatRoomList = <ChatRoomModel>[].obs;
   void onInit() async {
     super.onInit();
     await getUserList();
+  }
+
+  void searchUsers(String query) {
+    if (query.isEmpty) {
+      filteredUserList.assignAll(userList);
+    } else {
+      filteredUserList.assignAll(
+        userList
+            .where((user) =>
+                user.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
+            .toList(),
+      );
+    }
   }
 
   Future<void> getUserList() async {
@@ -84,18 +99,33 @@ class ContactController extends GetxController {
     }
   }
 
+  // Stream<List<UserModel>> getContacts() {
+  //   return db
+  //       .collection("users")
+  //       .doc(auth.currentUser!.uid)
+  //       .collection("contacts")
+  //       .snapshots()
+  //       .map(
+  //         (snapshot) => snapshot.docs
+  //             .map(
+  //               (doc) => UserModel.fromJson(doc.data()),
+  //             )
+  //             .toList(),
+  //             print('Fetched contacts: ${contacts.length}'); // Debugging line
+  //       return contacts;
+  //       );
+  // }
   Stream<List<UserModel>> getContacts() {
     return db
         .collection("users")
         .doc(auth.currentUser!.uid)
         .collection("contacts")
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(
-                (doc) => UserModel.fromJson(doc.data()),
-              )
-              .toList(),
-        );
+        .map((snapshot) {
+      List<UserModel> contacts =
+          snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+      print('Fetched contacts: ${contacts.length}'); // Debugging line
+      return contacts;
+    });
   }
 }

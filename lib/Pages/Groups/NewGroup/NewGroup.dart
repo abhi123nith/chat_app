@@ -2,9 +2,11 @@
 
 import 'package:chat_app/Controller/ContactController.dart';
 import 'package:chat_app/Controller/GroupController.dart';
+import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/Pages/Groups/NewGroup/GroupTitle.dart';
 import 'package:chat_app/Pages/Groups/NewGroup/SelectMemberList.dart';
 import 'package:chat_app/Pages/Home/Widget/ChatTile.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import for Firebase Auth
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +19,9 @@ class NewGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     ContactController contactController = Get.put(ContactController());
     GroupController groupController = Get.put(GroupController());
+    String currentUserId =
+        FirebaseAuth.instance.currentUser!.uid; // Get current user ID
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Group'),
@@ -28,11 +33,9 @@ class NewGroup extends StatelessWidget {
               : Theme.of(context).colorScheme.primary,
           onPressed: () {
             if (groupController.groupMembers.isEmpty) {
-              Get.snackbar("Error", "Please select atleast one member");
+              Get.snackbar("Error", "Please select at least one member");
             } else {
-              Get.to(const GroupTitle()
-
-              );
+              Get.to(const GroupTitle());
             }
           },
           child: Icon(
@@ -57,7 +60,7 @@ class NewGroup extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: StreamBuilder(
+              child: StreamBuilder<List<UserModel>>(
                 stream: contactController.getContacts(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -70,26 +73,35 @@ class NewGroup extends StatelessWidget {
                       child: Text("Error: ${snapshot.error}"),
                     );
                   }
-                  if (snapshot.data == null) {
+                  if (snapshot.data == null || snapshot.data!.isEmpty) {
                     return const Center(
-                      child: Text("No Messages"),
+                      child: Text("No Contacts"),
                     );
                   } else {
+                    // Filter out the current user
+                    var filteredContacts = snapshot.data!
+                        .where((user) => user.id != currentUserId)
+                        .toList();
+
                     return ListView.builder(
-                      itemCount: snapshot.data!.length,
+                      itemCount: filteredContacts.length,
                       itemBuilder: (context, index) {
                         return InkWell(
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () {
-                            groupController.selectMember(snapshot.data![index]);
+                            groupController
+                                .selectMember(filteredContacts[index]);
                           },
                           child: ChatTile(
-                            imageUrl: snapshot.data![index].profileImage ??
+                            imageUrl: filteredContacts[index].profileImage ??
                                 AssetsImage.defaultProfileUrl,
-                            name: snapshot.data![index].name!,
-                            lastChat: snapshot.data![index].about ?? "",
-                            lastTime: "", roomId: '',
+                            name: filteredContacts[index].name!,
+                            lastChat: filteredContacts[index].about == ""
+                                ? "Hey, I am using Sampark App!"
+                                : filteredContacts[index].about!,
+                            lastTime: "",
+                            roomId: '',
                           ),
                         );
                       },

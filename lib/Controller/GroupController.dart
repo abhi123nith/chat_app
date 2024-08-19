@@ -1,5 +1,6 @@
 import 'package:chat_app/Controller/ProfileController.dart';
 import 'package:chat_app/Model/ChatMode.dart';
+import 'package:chat_app/Model/ChatRoomModel.dart';
 import 'package:chat_app/Model/GroupModel.dart';
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/Pages/Home/HomePage.dart';
@@ -8,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 class GroupController extends GetxController {
@@ -109,30 +111,42 @@ class GroupController extends GetxController {
     });
   }
 
-  Future<void> sendGroupMessage(
-      String message, String groupId, String imagePath) async {
-    isLoading.value = true;
-    var chatId = uuid.v6();
-    String imageUrl =
-        await profileController.uploadFileToFirebase(selectedImagePath.value);
+ Future<void> sendGMessage(String groupId, String message, String s) async {
+    // Existing implementation
+    String chatId = uuid.v6();
+    DateTime timestamp = DateTime.now();
+    String nowTime = DateFormat('hh:mm a').format(timestamp);
+
+    List<Object> groupMembers = await getGroupMembers(groupId);
+
     var newChat = ChatModel(
       id: chatId,
       message: message,
-      imageUrl: imageUrl,
-      senderId: auth.currentUser!.uid,
-      senderName: profileController.currentUser.value.name,
+      senderId: profileController.currentUser.value.id,
       timestamp: DateTime.now().toString(),
+      readBy: [profileController.currentUser.value.id!], // Initialize with the current user's ID
     );
-    await db
-        .collection("groups")
-        .doc(groupId)
-        .collection("messages")
-        .doc(chatId)
-        .set(
-          newChat.toJson(),
-        );
-    selectedImagePath.value = "";
-    isLoading.value = false;
+
+    var roomDetails = ChatRoomModel(
+      id: groupId,
+      lastMessage: message,
+      lastMessageTimestamp: nowTime,
+      timestamp: DateTime.now().toString(),
+      unReadMessNo: groupMembers.length, // Initialize unread message count
+    );
+
+    try {
+      await db
+          .collection("chats")
+          .doc(groupId)
+          .collection("messages")
+          .doc(chatId)
+          .set(newChat.toJson());
+
+      await db.collection("chats").doc(groupId).set(roomDetails.toJson());
+    } catch (e) {
+      print(e);
+    }
   }
 
   Stream<List<ChatModel>> getGroupMessages(String groupId) {
@@ -174,24 +188,89 @@ class GroupController extends GetxController {
     }
   }
 
-  Future<void> addMemberToGroup(String groupId, UserModel user) async {
-    try {
-      // Add the user to the group
-      await _firestore.collection('groups').doc(groupId).update({
-        'members': FieldValue.arrayUnion([user.toJson()]),
-      });
+  void addMemberToGroup(String groupId, UserModel user) async {
+    final groupRef = _firestore.collection('groups').doc(groupId);
+    final groupSnapshot = await groupRef.get();
 
-      // Optionally, you might want to add the group to the user's list of groups
-      await _firestore.collection('users').doc(user.id).update({
-        'groups': FieldValue.arrayUnion([groupId]),
-      });
+    if (groupSnapshot.exists) {
+      final groupData = groupSnapshot.data()!;
+      final groupModel = GroupModel.fromJson(groupData);
 
-      Get.snackbar("Success", "Member added to the group successfully");
-    } catch (e) {
-      Get.snackbar("Error", "Failed to add member to the group: $e");
+      if (!groupModel.members!.any((member) => member.id == user.id)) {
+        groupModel.members!.add(user);
+        await groupRef.update(groupModel.toJson());
+        groupList.firstWhere((group) => group.id == groupId).members!.add(user);
+        Get.snackbar("Success", "${user.name} added to the group");
+      }
     }
   }
 
+  void removeMemberFromGroup(String groupId, UserModel user) async {
+    final groupRef = _firestore.collection('groups').doc(groupId);
+    final groupSnapshot = await groupRef.get();
+
+    if (groupSnapshot.exists) {
+      final groupData = groupSnapshot.data()!;
+      final groupModel = GroupModel.fromJson(groupData);
+
+      if (groupModel.members!.any((member) => member.id == user.id)) {
+        groupModel.members!.removeWhere((member) => member.id == user.id);
+        await groupRef.update(groupModel.toJson());
+        groupList
+            .firstWhere((group) => group.id == groupId)
+            .members!
+            .removeWhere((member) => member.id == user.id);
+        Get.snackbar("Success", "${user.name} removed from the group");
+      } else {
+        Get.snackbar("Info", "${user.name} is not a member of this group");
+      }
+    }
+  }
+
+Future<void> markGMessagesAsRead(String groupId) async {
+    QuerySnapshot<Map<String, dynamic>> messagesSnapshot = await db
+        .collection("chats")
+        .doc(groupId)
+        .collection("messages")
+        .where("readBy", arrayContains: profileController.currentUser.value.id)
+        .get();
+
+    List<Object> groupMembers = await getGroupMembers(groupId);
+
+    for (QueryDocumentSnapshot<Map<String, dynamic>> messageDoc
+        in messagesSnapshot.docs) {
+      ChatModel message = ChatModel.fromJson(messageDoc.data());
+
+      if (message.readBy!.length >= groupMembers.length) {
+        await db
+            .collection("chats")
+            .doc(groupId)
+            .collection("messages")
+            .doc(messageDoc.id)
+            .update({"readBy": FieldValue.arrayUnion([profileController.currentUser.value.id])});
+      }
+    }
+
+    // Update unread message count
+    await updateUnreadMessageCount(groupId);
+  }
+
+  Future<void> updateUnreadMessageCount(String groupId) async {
+    List<Object> groupMembers = await getGroupMembers(groupId);
+    
+    int unreadCount = await db
+        .collection("chats")
+        .doc(groupId)
+        .collection("messages")
+        .where("readBy", arrayContains: profileController.currentUser.value.id)
+        .where("readBy", isLessThan: groupMembers.length)
+        .get()
+        .then((snapshot) => snapshot.docs.length);
+
+    await db.collection("chats").doc(groupId).update({
+      'unReadMessNo': unreadCount,
+    });
+  }
   // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> showEditGroupDialog(BuildContext context, String groupId,
@@ -266,4 +345,20 @@ class GroupController extends GetxController {
       print("Failed to update group info: $e");
     }
   }
+
+  Stream<List<UserModel>> getAllUsers() {
+    return _firestore.collection('users').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return UserModel.fromJson(doc.data());
+      }).toList();
+    });
+  }
+
+  Future<List<Object>> getGroupMembers(String groupId) async {
+    var groupDoc = await db.collection('groups').doc(groupId).get();
+    GroupModel group = GroupModel.fromJson(groupDoc.data()!);
+    return group.members ?? [];
+  }
+
+
 }

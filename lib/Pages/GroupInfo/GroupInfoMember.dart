@@ -123,7 +123,7 @@ class GroupMemberInfo extends StatelessWidget {
                           SvgPicture.asset(
                             AssetsImage.profileVideoCall,
                             width: 25,
-                            color: const Color(0xffFF9900),
+                            //  color: const Color(0xffFF9900),
                           ),
                           const SizedBox(width: 10),
                           const Text(
@@ -138,7 +138,7 @@ class GroupMemberInfo extends StatelessWidget {
                     if (user != null)
                       InkWell(
                         onTap: () async {
-                          await groupController.addMemberToGroup(
+                          groupController.addMemberToGroup(
                               groupId, user!);
                         },
                         child: Container(

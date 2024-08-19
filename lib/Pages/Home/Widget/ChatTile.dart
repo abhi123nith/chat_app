@@ -13,6 +13,9 @@ class ChatTile extends StatelessWidget {
   final String lastTime;
   final String roomId;
   final int unreadCount;
+  final String role;
+  //final fu Callback;
+  final bool isCurrentUser;
 
   const ChatTile({
     super.key,
@@ -22,6 +25,8 @@ class ChatTile extends StatelessWidget {
     required this.lastTime,
     required this.roomId,
     this.unreadCount = 0,
+    this.role = "User",
+    this.isCurrentUser = false,
   });
 
   @override
@@ -143,7 +148,7 @@ class ChatTile extends StatelessWidget {
                 height: 5,
               ),
               Text(
-                lastTime,
+                isCurrentUser ? "You" : lastTime,
                 style: Theme.of(context).textTheme.labelMedium,
               ),
             ],
