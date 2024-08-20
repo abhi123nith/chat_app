@@ -8,6 +8,7 @@ import 'package:chat_app/Controller/ImagePicker.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
 import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:chat_app/Widget/PrimaryButton.dart';
+import 'package:chat_app/config/CustomMessage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -243,12 +244,7 @@ class ProfilePage extends StatelessWidget {
                                           phone.text,
                                         );
                                         isEdit.value = false;
-                                        Get.snackbar(" Profile Updated ", "",
-                                            colorText: Colors.white,
-                                            margin: const EdgeInsets.all(8),
-                                            backgroundColor: Colors.green,
-                                            icon: const Icon(
-                                                Icons.download_done_rounded));
+                                        successMessage('Updated');
                                       },
                                     )
                                   : PrimaryButton(
@@ -303,6 +299,7 @@ class ProfilePage extends StatelessWidget {
                     backgroundColor: Colors.green,
                     icon: const Icon(Icons.download_done_rounded));
                 Get.back(); // Close the dialog and log out
+                successMessage("LogOuted Successfully");
               },
               child: const Text("Logout"),
             ),

@@ -1,4 +1,5 @@
 import 'package:chat_app/Controller/ContactController.dart';
+import 'package:chat_app/Controller/ProfileController.dart';
 import 'package:chat_app/Pages/Chat/ChatPage.dart';
 import 'package:chat_app/Pages/ContactPage/Widgets/NewContactTile.dart';
 import 'package:chat_app/Pages/Groups/NewGroup/NewGroup.dart';
@@ -15,22 +16,29 @@ class ContactPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RxBool isSearchEnable = false.obs;
+    // Initialize RxBool for search state
+    final RxBool isSearchEnable = false.obs;
     final TextEditingController searchController = TextEditingController();
 
-    ContactController contactController = Get.put(ContactController());
+    // Initialize ContactController and ProfileController
+    final ContactController contactController = Get.put(ContactController());
+    final ProfileController profileController = Get.find<ProfileController>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Obx(() => isSearchEnable.value
-            ? UserSearchBar(
-                searchController: searchController,
-                onChanged: contactController.searchUsers,
-              )
-            : const Text("Select contact")),
+        title: Obx(() {
+          if (isSearchEnable.value) {
+            return UserSearchBar(
+              searchController: searchController,
+              onChanged: contactController.searchUsers,
+            );
+          } else {
+            return const Text("Select contact");
+          }
+        }),
         actions: [
-          Obx(
-            () => IconButton(
+          Obx(() {
+            return IconButton(
               onPressed: () {
                 isSearchEnable.value = !isSearchEnable.value;
                 if (!isSearchEnable.value) {
@@ -39,21 +47,118 @@ class ContactPage extends StatelessWidget {
                 }
               },
               icon: Icon(isSearchEnable.value ? Icons.close : Icons.search),
-            ),
-          ),
+            );
+          }),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child: Obx(
-          () => isSearchEnable.value
-              ? Expanded(
+        child: Obx(() {
+          if (isSearchEnable.value) {
+            // Search mode is enabled
+            return Expanded(
+              child: ListView.separated(
+                itemCount: contactController.filteredUserList.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  var user = contactController.filteredUserList[index];
+                  return InkWell(
+                    onTap: () {
+                      Get.to(ChatPage(userModel: user));
+                    },
+                    child: ChatTile(
+                      imageUrl: user.profileImage?.isNotEmpty == true
+                          ? user.profileImage!
+                          : AssetsImage.defaultProfileUrl,
+                      name: user.id == profileController.currentUser.value.id
+                          ? 'You'
+                          : user.name ?? 'User',
+                      lastChat: user.about ?? 'Hey there!',
+                      lastTime:
+                          '', // Update this according to your requirements
+                      roomId: '', // Handle this appropriately
+                    ),
+                  );
+                },
+              ),
+            );
+          } else {
+            // Default view
+            return Column(
+              children: [
+                NewContactTile(
+                  btnName: "New Group",
+                  icon: Icons.group_add,
+                  ontap: () {
+                    Get.to(const NewGroup());
+                  },
+                ),
+                const SizedBox(height: 10),
+                NewContactTile(
+                  btnName: "Start Live Streaming",
+                  icon: Icons.live_tv,
+                  ontap: () {
+                    Get.defaultDialog(
+                      title: 'Live Streaming',
+                      content: Column(
+                        children: [
+                          const Text(
+                            'You are here for?',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Get.to(
+                                      const LiveScreenView(liveID: 'liveId'));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                ),
+                                child: const Text(
+                                  'Watch',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Get.to(const LiveScreenView(
+                                    liveID: 'liveId',
+                                    isHost: true,
+                                  ));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                ),
+                                child: const Text(
+                                  'Start',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      backgroundColor: Colors.grey,
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                const Text("Contacts on Sampark"),
+                const SizedBox(height: 10),
+                Expanded(
                   child: ListView.separated(
-                    itemCount: contactController.filteredUserList.length,
+                    itemCount: contactController.userList.length,
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      var user = contactController.filteredUserList[index];
+                      var user = contactController.userList[index];
                       return InkWell(
                         onTap: () {
                           Get.to(ChatPage(userModel: user));
@@ -62,8 +167,13 @@ class ContactPage extends StatelessWidget {
                           imageUrl: user.profileImage?.isNotEmpty == true
                               ? user.profileImage!
                               : AssetsImage.defaultProfileUrl,
-                          name: user.name ?? 'User',
-                          lastChat: user.about ?? 'Hey there!',
+                          name:
+                              user.id == profileController.currentUser.value.id
+                                  ? 'You'
+                                  : user.name ?? 'User',
+                          lastChat: user.about?.isNotEmpty == true
+                              ? user.about!
+                              : 'Hey, I am using Sampark App!',
                           lastTime:
                               '', // Update this according to your requirements
                           roomId: '', // Handle this appropriately
@@ -71,111 +181,11 @@ class ContactPage extends StatelessWidget {
                       );
                     },
                   ),
-                )
-              : Column(
-                  children: [
-                    NewContactTile(
-                      btnName: "New Group",
-                      icon: Icons.group_add,
-                      ontap: () {
-                        Get.to(const NewGroup());
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    NewContactTile(
-                      btnName: "Start Live Streaming",
-                      icon: Icons.live_tv,
-                      ontap: () {
-                        Get.defaultDialog(
-                            title: 'Live Streaming ',
-                            content: Column(
-                              children: [
-                                const Text(
-                                  'You are here for ?',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16),
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          Get.to(const LiveScreenView(
-                                              liveID: 'liveId'));
-                                        },
-                                        style: const ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStatePropertyAll(
-                                                    Colors.blue)),
-                                        child: const Text(
-                                          'Watch',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16),
-                                        )),
-                                    ElevatedButton(
-                                        style: const ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStatePropertyAll(
-                                                    Colors.blue)),
-                                        onPressed: () {
-                                          Get.to(const LiveScreenView(
-                                            liveID: 'liveId',
-                                            isHost: true,
-                                          ));
-                                        },
-                                        child: const Text(
-                                          'Start',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16),
-                                        ))
-                                  ],
-                                ),
-                              ],
-                            ),
-                            backgroundColor: Colors.grey);
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    const Row(
-                      children: [
-                        Text("Contacts on Sampark"),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: contactController.userList.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          var user = contactController.userList[index];
-                          return InkWell(
-                            onTap: () {
-                              Get.to(ChatPage(userModel: user));
-                            },
-                            child: ChatTile(
-                              imageUrl: user.profileImage?.isNotEmpty == true
-                                  ? user.profileImage!
-                                  : AssetsImage.defaultProfileUrl,
-                              name: user.name ?? 'User',
-                              lastChat: user.about == ""
-                                  ? 'Hey, I am using Sampark App!'
-                                  : user.about!,
-                              lastTime:
-                                  '', // Update this according to your requirements
-                              roomId: '', // Handle this appropriately
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
                 ),
-        ),
+              ],
+            );
+          }
+        }),
       ),
     );
   }

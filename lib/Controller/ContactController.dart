@@ -99,22 +99,7 @@ class ContactController extends GetxController {
     }
   }
 
-  // Stream<List<UserModel>> getContacts() {
-  //   return db
-  //       .collection("users")
-  //       .doc(auth.currentUser!.uid)
-  //       .collection("contacts")
-  //       .snapshots()
-  //       .map(
-  //         (snapshot) => snapshot.docs
-  //             .map(
-  //               (doc) => UserModel.fromJson(doc.data()),
-  //             )
-  //             .toList(),
-  //             print('Fetched contacts: ${contacts.length}'); // Debugging line
-  //       return contacts;
-  //       );
-  // }
+ 
   Stream<List<UserModel>> getContacts() {
     return db
         .collection("users")

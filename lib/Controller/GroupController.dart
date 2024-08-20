@@ -170,6 +170,8 @@ class GroupController extends GetxController {
       senderId: auth.currentUser!.uid,
       senderName: profileController.currentUser.value.name,
       timestamp: DateTime.now().toString(),
+      lastMessage: message,
+      lastMessageTime: DateTime.now().toString(),
     );
     await db
         .collection("groups")
@@ -179,6 +181,11 @@ class GroupController extends GetxController {
         .set(
           newChat.toJson(),
         );
+    // Update the group's last message and time
+    await db.collection('groups').doc(groupId).update({
+      'lastMessage': message,
+      'lastMessageTime': DateTime.now().toString(),
+    });
     selectedImagePath.value = "";
     isLoading.value = false;
   }

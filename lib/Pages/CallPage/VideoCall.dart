@@ -1,5 +1,5 @@
-import 'package:chat_app/Controller/ChatController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/config/String.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +13,7 @@ class VideoCallPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ProfileController profileController = Get.put(ProfileController());
-    ChatController chatController = Get.put(ChatController());
+    ChattController chatController = Get.put(ChattController());
     var callId = chatController.getRoomId(target.id!);
     return ZegoUIKitPrebuiltCall(
       appID: ZegoCloudConfig.appId,

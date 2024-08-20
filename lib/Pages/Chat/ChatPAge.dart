@@ -5,8 +5,8 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/Controller/CallController.dart';
-import 'package:chat_app/Controller/ChatController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/Pages/CallPage/AudioCallPage.dart';
 import 'package:chat_app/Pages/CallPage/VideoCall.dart';
@@ -25,7 +25,7 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ChatController chatController = Get.put(ChatController());
+    ChattController chatController = Get.put(ChattController());
     TextEditingController messageController = TextEditingController();
     ProfileController profileController = Get.put(ProfileController());
     CallController callController = Get.put(CallController());
@@ -202,18 +202,15 @@ class ChatPage extends StatelessWidget {
                             String formattedTime =
                                 DateFormat('hh:mm a').format(timestamp);
 
-                            return InkWell(
-                              onLongPress: () {
-                                showBottomSheet();
-                              },
-                              child: ChatBubble(
-                                message: snapshot.data![index].message!,
-                                imageUrl: snapshot.data![index].imageUrl ?? "",
-                                isComming: snapshot.data![index].receiverId ==
-                                    profileController.currentUser.value.id,
-                                status: snapshot.data![index].readStatus!,
-                                time: formattedTime,
-                              ),
+                            return ChatBubble(
+                              message: snapshot.data![index].message!,
+                              imageUrl: snapshot.data![index].imageUrl ?? "",
+                              isComming: snapshot.data![index].receiverId ==
+                                  profileController.currentUser.value.id,
+                              status: snapshot.data![index].readStatus!,
+                              time: formattedTime,
+                              messageId: snapshot.data![index].id!,
+                              roomId: roomid,
                             );
                           },
                         );
@@ -270,53 +267,5 @@ class ChatPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void showBottomSheet() {
-    Get.bottomSheet(Expanded(
-      child: Container(
-        height: 110,
-        decoration: const BoxDecoration(
-            color: Colors.grey,
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-        child: Column(
-          children: [
-            const Divider(),
-            InkWell(
-              onTap: () {
-                
-              },
-              child: Container(
-                margin: const EdgeInsets.only(left: 30),
-                child: const Row(
-                  children: [
-                    Icon(Icons.delete),
-                    SizedBox(width: 8),
-                    Text('Delete Message')
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            InkWell(
-              onTap: () {},
-              child: Container(
-                margin: const EdgeInsets.only(left: 30),
-                child: const Row(
-                  children: [
-                    Icon(Icons.delete),
-                    SizedBox(width: 8),
-                    Text('Edit Message')
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ));
   }
 }

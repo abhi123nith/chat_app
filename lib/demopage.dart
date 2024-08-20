@@ -1,14 +1,13 @@
-import 'package:chat_app/Controller/ChatController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 
 class DemoPage2 extends StatelessWidget {
   const DemoPage2({super.key});
 
   @override
   Widget build(BuildContext context) {
-    ChatController chatController = Get.put(ChatController());
+    ChattController chatController = Get.put(ChattController());
     return Scaffold(
       appBar: AppBar(
         title: const Text('Demo Page'),

@@ -13,7 +13,6 @@ import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:chat_app/Widget/groupAudioCall.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -112,19 +111,15 @@ class GroupChatPage extends StatelessWidget {
                             final String formattedTime =
                                 DateFormat('hh:mm a').format(timestamp);
 
-                            return GestureDetector(
-                              onLongPress: () {
-                                _showMessageOptions(context, chat,
-                                    profileController.currentUser.value.id!);
-                              },
-                              child: ChatBubble(
-                                message: chat.message!,
-                                imageUrl: chat.imageUrl ?? "",
-                                isComming: chat.senderId !=
-                                    profileController.currentUser.value.id,
-                                time: formattedTime,
-                                status: chat.readStatus ?? "sent",
-                              ),
+                            return ChatBubble(
+                              message: chat.message!,
+                              imageUrl: chat.imageUrl ?? "",
+                              isComming: chat.senderId !=
+                                  profileController.currentUser.value.id,
+                              time: formattedTime,
+                              status: chat.readStatus ?? "sent",
+                              messageId: chat.id!,
+                              roomId: groupModel.id!,
                             );
                           },
                         );
@@ -176,56 +171,6 @@ class GroupChatPage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _showMessageOptions(
-      BuildContext context, ChatModel chat, String currentUserId) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (chat.imageUrl != null && chat.imageUrl!.isNotEmpty)
-              ListTile(
-                leading: const Icon(Icons.download),
-                title: const Text('Download'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Implement Download functionality here
-                },
-              )
-            else
-              ListTile(
-                leading: const Icon(Icons.copy),
-                title: const Text('Copy Text'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Clipboard.setData(ClipboardData(text: chat.message!));
-                },
-              ),
-            if (chat.senderId == currentUserId)
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Edit Message'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Implement Edit functionality here
-                },
-              ),
-            if (chat.senderId == currentUserId)
-              ListTile(
-                leading: const Icon(Icons.delete),
-                title: const Text('Delete Message'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Implement Delete functionality here
-                },
-              ),
-          ],
-        );
-      },
     );
   }
 }

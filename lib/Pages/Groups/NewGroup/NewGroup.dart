@@ -17,10 +17,9 @@ class NewGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ContactController contactController = Get.put(ContactController());
-    GroupController groupController = Get.put(GroupController());
-    String currentUserId =
-        FirebaseAuth.instance.currentUser!.uid; // Get current user ID
+    final ContactController contactController = Get.put(ContactController());
+    final GroupController groupController = Get.put(GroupController());
+    final String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -73,7 +72,7 @@ class NewGroup extends StatelessWidget {
                       child: Text("Error: ${snapshot.error}"),
                     );
                   }
-                  if (snapshot.data == null || snapshot.data!.isEmpty) {
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
                       child: Text("No Contacts"),
                     );
@@ -86,22 +85,24 @@ class NewGroup extends StatelessWidget {
                     return ListView.builder(
                       itemCount: filteredContacts.length,
                       itemBuilder: (context, index) {
+                        var user = filteredContacts[index];
                         return InkWell(
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () {
-                            groupController
-                                .selectMember(filteredContacts[index]);
+                            groupController.selectMember(user);
                           },
                           child: ChatTile(
-                            imageUrl: filteredContacts[index].profileImage ??
-                                AssetsImage.defaultProfileUrl,
-                            name: filteredContacts[index].name!,
-                            lastChat: filteredContacts[index].about == ""
-                                ? "Hey, I am using Sampark App!"
-                                : filteredContacts[index].about!,
-                            lastTime: "",
-                            roomId: '',
+                            imageUrl: user.profileImage?.isNotEmpty == true
+                                ? user.profileImage!
+                                : AssetsImage.defaultProfileUrl,
+                            name: user.name ?? 'User',
+                            lastChat: user.about?.isNotEmpty == true
+                                ? user.about!
+                                : "Hey, I am using Sampark App!",
+                            lastTime:
+                                "", // Update this according to your requirements
+                            roomId: '', // Handle this appropriately
                           ),
                         );
                       },

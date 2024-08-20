@@ -13,6 +13,8 @@ class ChatModel {
   String? audioUrl;
   String? documentUrl;
   String? groupId;
+  String? lastMessage;
+  String? lastMessageTime;
   List<String>? readBy;
   List<String>? reactions;
   List<dynamic>? replies;
@@ -32,6 +34,8 @@ class ChatModel {
     this.readBy = const [], // Initialize this field
     this.reactions,
     this.replies,
+    this.lastMessage,
+    this.lastMessageTime,
   });
 
   ChatModel.fromJson(Map<String, dynamic> json) {

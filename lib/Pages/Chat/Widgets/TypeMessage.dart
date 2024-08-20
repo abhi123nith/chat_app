@@ -1,6 +1,4 @@
-// ignore_for_file: sized_box_for_whitespace
-
-import 'package:chat_app/Controller/ChatController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/Widget/ImagePickerBottomSheet.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +8,13 @@ import 'package:get/get.dart';
 import '../../../Config/Images.dart';
 import '../../../Controller/ImagePicker.dart';
 
-
 class TypeMessage extends StatelessWidget {
   final UserModel userModel;
   const TypeMessage({super.key, required this.userModel});
 
   @override
   Widget build(BuildContext context) {
-    ChatController chatController = Get.put(ChatController());
+    ChattController chatController = Get.put(ChattController());
     TextEditingController messageController = TextEditingController();
     RxString message = "".obs;
     ImagePickerController imagePickerController =
@@ -31,7 +28,7 @@ class TypeMessage extends StatelessWidget {
           color: Theme.of(context).colorScheme.primaryContainer),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: 30,
             height: 30,
             child: SvgPicture.asset(
@@ -69,7 +66,7 @@ class TypeMessage extends StatelessWidget {
                           chatController.selectedImagePath,
                           imagePickerController);
                     },
-                    child: Container(
+                    child: SizedBox(
                       width: 30,
                       height: 30,
                       child: SvgPicture.asset(
@@ -96,7 +93,7 @@ class TypeMessage extends StatelessWidget {
                         message.value = "";
                       }
                     },
-                    child: Container(
+                    child: SizedBox(
                       width: 30,
                       height: 30,
                       child: chatController.isLoading.value
@@ -107,7 +104,7 @@ class TypeMessage extends StatelessWidget {
                             ),
                     ),
                   )
-                : Container(
+                : SizedBox(
                     width: 30,
                     height: 30,
                     child: SvgPicture.asset(

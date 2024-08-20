@@ -1,9 +1,8 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:chat_app/Controller/ContactController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:chat_app/Pages/CallHistory/callHistory.dart';
-import 'package:chat_app/Pages/Chat/ChatPAge.dart';
+import 'package:chat_app/Pages/Chat/ChatPage.dart';
 import 'package:chat_app/Pages/Groups/GroupsPage.dart';
 import 'package:chat_app/Pages/Home/Widget/ChatTile.dart';
 import 'package:chat_app/Pages/Home/Widget/ChatsList.dart';
@@ -14,7 +13,7 @@ import 'package:chat_app/config/Images.dart';
 import 'package:chat_app/config/String.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
@@ -33,8 +32,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final TabController tabController = TabController(length: 3, vsync: this);
     final ProfileController profileController = Get.put(ProfileController());
     final ContactController contactController = Get.put(ContactController());
+    Get.lazyPut(() => ChattController());
 
-    // Fetch current user ID
+    // Ensure currentUser is not null before accessing uid
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
     return Scaffold(
@@ -60,19 +60,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         ),
         actions: [
-          Obx(
-            () => IconButton(
-              onPressed: () {
-                setState(() {
-                  isSearchEnable.value = !isSearchEnable.value;
-                  if (!isSearchEnable.value) {
-                    searchController.clear();
-                    contactController.searchUsers('');
-                  }
-                });
-              },
-              icon: Icon(isSearchEnable.value ? Icons.close : Icons.search),
-            ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                isSearchEnable.value = !isSearchEnable.value;
+                if (!isSearchEnable.value) {
+                  searchController.clear();
+                  contactController.searchUsers('');
+                }
+              });
+            },
+            icon: Icon(isSearchEnable.value ? Icons.close : Icons.search),
           ),
           IconButton(
             onPressed: () async {
@@ -93,7 +91,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: Icon(
           Icons.add,
-          color: Theme.of(context).colorScheme.onBackground,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
       body: Padding(
@@ -101,36 +99,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: TabBarView(
           controller: tabController,
           children: [
-            isSearchEnable.value
-                ? Obx(
-                    () => ListView.separated(
-                      itemCount: contactController.filteredUserList.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        var user = contactController.filteredUserList[index];
-                        return InkWell(
-                          onTap: () {
-                            Get.to(ChatPage(userModel: user));
-                          },
-                          child: ChatTile(
-                            imageUrl: user.profileImage?.isNotEmpty == true
-                                ? user.profileImage!
-                                : AssetsImage.defaultProfileUrl,
-                            name: user.name ?? 'User',
-                            lastChat: user.about == ""
-                                ? 'Hey, I am using Sampark App!'
-                                : user.about!,
-                            lastTime: '',
-                            roomId: '',
-                            isCurrentUser: user.id ==
-                                currentUserId, // Check if the user is the current user
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : const ChatList(),
+            Obx(
+              () {
+                // Check if filteredUserList is not null
+                final users = contactController.filteredUserList;
+
+                return isSearchEnable.value
+                    ? ListView.separated(
+                        itemCount: users.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          var user = users[index];
+                          // Ensure user fields are not null
+                          return InkWell(
+                            onTap: () {
+                              Get.to(ChatPage(userModel: user));
+                            },
+                            child: ChatTile(
+                              imageUrl: user.profileImage?.isNotEmpty == true
+                                  ? user.profileImage!
+                                  : AssetsImage.defaultProfileUrl,
+                              name: user.name ?? 'User',
+                              lastChat: user.about == ""
+                                  ? 'Hey, I am using Sampark App!'
+                                  : user.about!,
+                              lastTime: '',
+                              roomId: '',
+                              isCurrentUser: user.id == currentUserId,
+                            ),
+                          );
+                        },
+                      )
+                    : const ChatList();
+              },
+            ),
             const GroupPage(),
             const CallHistory(),
           ],

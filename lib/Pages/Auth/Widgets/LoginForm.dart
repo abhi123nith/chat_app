@@ -1,9 +1,9 @@
 import 'package:chat_app/Controller/AuthController.dart';
 import 'package:chat_app/Pages/Auth/ForgotPassword.dart';
 import 'package:chat_app/Widget/PrimaryButton.dart';
+import 'package:chat_app/config/CustomMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -63,6 +63,7 @@ class LoginForm extends StatelessWidget {
                           email.text,
                           password.text,
                         );
+                        successMessage("Logged in successfully");
                       },
                       btnName: "LOGIN",
                       icon: Icons.lock_open_outlined,

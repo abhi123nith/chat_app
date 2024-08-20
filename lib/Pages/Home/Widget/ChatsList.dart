@@ -1,6 +1,6 @@
-import 'package:chat_app/Controller/ChatController.dart';
 import 'package:chat_app/Controller/ContactController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:chat_app/Pages/Chat/ChatPAge.dart';
 import 'package:chat_app/Pages/Home/Widget/ChatTile.dart';
 import 'package:chat_app/config/Images.dart';
@@ -16,7 +16,7 @@ class ChatList extends StatelessWidget {
   Widget build(BuildContext context) {
     ContactController contactController = Get.put(ContactController());
     ProfileController profileController = Get.put(ProfileController());
-    ChatController chatController = Get.put(ChatController());
+    ChattController chatController = Get.put(ChattController());
     return StreamBuilder<List<ChatRoomModel>>(
       stream: contactController.getChatRoom(),
       builder: (context, snapshot) {
@@ -67,12 +67,11 @@ class ChatList extends StatelessWidget {
                   return ChatTile(
                     imageUrl: userModel!.profileImage ??
                         AssetsImage.defaultProfileUrl,
-                    name: userModel.name ?? 'User',
+                    name: profileController.currentUser.value.id == userModel.id
+                        ? "You"
+                        : userModel.name!,
                     lastChat: chatRoom.lastMessage ?? 'Last Message',
-                    lastTime:
-                        profileController.currentUser.value.id == userModel.id
-                            ? "You"
-                            : chatRoom.lastMessageTimestamp ?? 'Last Time',
+                    lastTime: chatRoom.lastMessageTimestamp ?? 'Last Time',
                     roomId: roomId,
                     unreadCount: unreadCount, // Pass unread count to ChatTile
                   );

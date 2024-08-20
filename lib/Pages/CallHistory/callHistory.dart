@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_app/Controller/ChatController.dart';
 import 'package:chat_app/Controller/ProfileController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/Pages/CallPage/AudioCallPage.dart'; // Import AudioCallPage
 import 'package:chat_app/Pages/CallPage/VideoCall.dart'; // Import VideoCallPage
@@ -17,7 +17,7 @@ class CallHistory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ChatController chatController = Get.put(ChatController());
+    ChattController chatController = Get.put(ChattController());
     ProfileController profileController = Get.put(ProfileController());
 
     return StreamBuilder(

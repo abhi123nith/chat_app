@@ -16,11 +16,12 @@ class GroupTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GroupController groupController = Get.put(GroupController());
-    ImagePickerController imagePickerController =
+    final GroupController groupController = Get.put(GroupController());
+    final ImagePickerController imagePickerController =
         Get.put(ImagePickerController());
-    RxString imagePath = "".obs;
-    RxString groupName = "".obs;
+    final RxString imagePath = ''.obs;
+    final RxString groupName = ''.obs;
+    final RxBool isLoading = false.obs; // Add an RxBool for loading state
 
     return Scaffold(
       appBar: AppBar(
@@ -31,14 +32,18 @@ class GroupTitle extends StatelessWidget {
           backgroundColor: groupName.isEmpty
               ? Colors.grey
               : Theme.of(context).colorScheme.primary,
-          onPressed: () {
-            if (groupName.isEmpty) {
+          onPressed: () async {
+            if (groupName.value.isEmpty) {
               Get.snackbar("Error", "Please enter group name");
             } else {
-              groupController.createGroup(groupName.value, imagePath.value);
+              isLoading.value = true; // Show progress indicator
+              await groupController.createGroup(
+                  groupName.value, imagePath.value);
+              isLoading.value = false; // Hide progress indicator
+              Get.back(); // Navigate back after creating the group
             }
           },
-          child: groupController.isLoading.value
+          child: isLoading.value
               ? const CircularProgressIndicator(
                   color: Colors.white,
                 )
@@ -65,9 +70,10 @@ class GroupTitle extends StatelessWidget {
                       Obx(
                         () => InkWell(
                           onTap: () async {
-                            imagePath.value = await imagePickerController
+                            final pickedImagePath = await imagePickerController
                                 .pickImage(ImageSource.gallery);
-                          },
+                            imagePath.value = pickedImagePath;
+                                                    },
                           child: Container(
                             width: 150,
                             height: 150,
@@ -75,7 +81,7 @@ class GroupTitle extends StatelessWidget {
                               color: Theme.of(context).colorScheme.primary,
                               borderRadius: BorderRadius.circular(100),
                             ),
-                            child: imagePath.value == ""
+                            child: imagePath.value.isEmpty
                                 ? const Icon(
                                     Icons.group,
                                     size: 40,
@@ -103,7 +109,7 @@ class GroupTitle extends StatelessWidget {
                       const SizedBox(height: 10),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -116,12 +122,13 @@ class GroupTitle extends StatelessWidget {
                       (e) => ChatTile(
                         imageUrl:
                             e.profileImage ?? AssetsImage.defaultProfileUrl,
-                        name: e.name!,
-                        lastChat: e.about == ""
-                            ? "Hey, I am using Sampark App!"
-                            : e.about!,
-                        lastTime: e.role ?? "User",
-                        roomId: '',
+                        name: e.name ?? 'User',
+                        lastChat: e.about?.isNotEmpty == true
+                            ? e.about!
+                            : "Hey, I am using Sampark App!",
+                        lastTime:
+                            '', // Update this according to your requirements
+                        roomId: '', // Handle this appropriately
                         role: e.role ?? "User", // Add role here
                       ),
                     )

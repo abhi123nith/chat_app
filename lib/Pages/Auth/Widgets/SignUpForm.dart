@@ -1,5 +1,6 @@
 import 'package:chat_app/Controller/AuthController.dart';
 import 'package:chat_app/Widget/PrimaryButton.dart';
+import 'package:chat_app/config/CustomMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -58,6 +59,7 @@ class SignupForm extends StatelessWidget {
                           password.text,
                           name.text,
                         );
+                        successMessage("Account created successfully");
                       },
                       btnName: "SIGNUP",
                       icon: Icons.lock_open_outlined,

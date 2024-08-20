@@ -1,7 +1,7 @@
 // ignore_for_file: sized_box_for_whitespace, unused_local_variable
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_app/Controller/ChatController.dart';
+import 'package:chat_app/Controller/chattcontroller.dart';
 import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,7 +31,7 @@ class ChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ChatController chatController = Get.put(ChatController());
+    ChattController chatController = Get.put(ChattController());
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
