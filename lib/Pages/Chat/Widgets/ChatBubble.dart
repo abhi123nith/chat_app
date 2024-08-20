@@ -1,9 +1,8 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 class ChatBubble extends StatelessWidget {
   final String message;
@@ -11,7 +10,7 @@ class ChatBubble extends StatelessWidget {
   final String time;
   final String status;
   final String imageUrl;
-  
+
   const ChatBubble({
     super.key,
     required this.message,
@@ -29,7 +28,11 @@ class ChatBubble extends StatelessWidget {
         crossAxisAlignment:
             isComming ? CrossAxisAlignment.start : CrossAxisAlignment.end,
         children: [
-          Container(
+          GestureDetector(
+            onLongPress: () {
+              _showMessageOptions(context);
+            },
+            child: Container(
               padding: const EdgeInsets.all(10),
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.sizeOf(context).width / 1.3,
@@ -71,7 +74,9 @@ class ChatBubble extends StatelessWidget {
                             : const SizedBox(height: 10),
                         message == "" ? Container() : Text(message),
                       ],
-                    )),
+                    ),
+            ),
+          ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment:
@@ -91,15 +96,73 @@ class ChatBubble extends StatelessWidget {
                         const SizedBox(width: 10),
                         SvgPicture.asset(
                           AssetsImage.chatStatusSvg,
+                          // ignore: deprecated_member_use
                           color: status == "read" ? Colors.green : Colors.grey,
                           width: 20,
-                        )
+                        ),
                       ],
                     ),
             ],
           )
         ],
       ),
+    );
+  }
+
+  void _showMessageOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: [
+            if (imageUrl.isEmpty)
+              ListTile(
+                leading: const Icon(Icons.copy),
+                title: const Text('Copy Message'),
+                onTap: () {
+                  // Handle copy message
+                  Navigator.pop(context);
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.download),
+                title: const Text('Download'),
+                onTap: () {
+                  // Handle copy message
+                  Navigator.pop(context);
+                },
+              ),
+            if (!isComming)
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Edit Message'),
+                onTap: () {
+                  // Handle edit message
+               //   String msg=
+                  Navigator.pop(context);
+                  Get.defaultDialog(
+
+                      title: 'Edit message', content: TextField(
+                        onChanged: (val)
+                        {
+
+                        },
+                      ));
+                },
+              ),
+            if (!isComming)
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Delete Message'),
+                onTap: () {
+                  // Handle delete message
+                  Navigator.pop(context);
+                },
+              ),
+          ],
+        );
+      },
     );
   }
 }

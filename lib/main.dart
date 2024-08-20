@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       builder: FToastBuilder(),
-      title: 'VibHub',
+      title: 'Sampark',
       theme: lightTheme,
       getPages: pagePath,
       darkTheme: darkTheme,

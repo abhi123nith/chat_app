@@ -3,6 +3,7 @@ import 'package:chat_app/Pages/Chat/ChatPage.dart';
 import 'package:chat_app/Pages/ContactPage/Widgets/NewContactTile.dart';
 import 'package:chat_app/Pages/Groups/NewGroup/NewGroup.dart';
 import 'package:chat_app/Pages/Home/Widget/userSearchBar.dart';
+import 'package:chat_app/Pages/Live/live.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,8 +22,7 @@ class ContactPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title:
-         Obx(() => isSearchEnable.value
+        title: Obx(() => isSearchEnable.value
             ? UserSearchBar(
                 searchController: searchController,
                 onChanged: contactController.searchUsers,
@@ -45,10 +45,8 @@ class ContactPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child:
-         Obx(
-          () => 
-          isSearchEnable.value
+        child: Obx(
+          () => isSearchEnable.value
               ? Expanded(
                   child: ListView.separated(
                     itemCount: contactController.filteredUserList.length,
@@ -83,17 +81,71 @@ class ContactPage extends StatelessWidget {
                         Get.to(const NewGroup());
                       },
                     ),
-                    
                     const SizedBox(height: 10),
-                  
+                    NewContactTile(
+                      btnName: "Start Live Streaming",
+                      icon: Icons.live_tv,
+                      ontap: () {
+                        Get.defaultDialog(
+                            title: 'Live Streaming ',
+                            content: Column(
+                              children: [
+                                const Text(
+                                  'You are here for ?',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Get.to(const LiveScreenView(
+                                              liveID: 'liveId'));
+                                        },
+                                        style: const ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                                    Colors.blue)),
+                                        child: const Text(
+                                          'Watch',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16),
+                                        )),
+                                    ElevatedButton(
+                                        style: const ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                                    Colors.blue)),
+                                        onPressed: () {
+                                          Get.to(const LiveScreenView(
+                                            liveID: 'liveId',
+                                            isHost: true,
+                                          ));
+                                        },
+                                        child: const Text(
+                                          'Start',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16),
+                                        ))
+                                  ],
+                                ),
+                              ],
+                            ),
+                            backgroundColor: Colors.grey);
+                      },
+                    ),
+                    const SizedBox(height: 10),
                     const Row(
                       children: [
                         Text("Contacts on Sampark"),
                       ],
                     ),
-                   
                     const SizedBox(height: 10),
-                  
                     Expanded(
                       child: ListView.separated(
                         itemCount: contactController.userList.length,

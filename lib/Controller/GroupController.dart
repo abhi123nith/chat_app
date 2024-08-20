@@ -1,6 +1,5 @@
 import 'package:chat_app/Controller/ProfileController.dart';
 import 'package:chat_app/Model/ChatMode.dart';
-import 'package:chat_app/Model/ChatRoomModel.dart';
 import 'package:chat_app/Model/GroupModel.dart';
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/Pages/Home/HomePage.dart';
@@ -9,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 class GroupController extends GetxController {
@@ -111,59 +109,95 @@ class GroupController extends GetxController {
     });
   }
 
- Future<void> sendGMessage(String groupId, String message, String s) async {
-    // Existing implementation
-    String chatId = uuid.v6();
-    DateTime timestamp = DateTime.now();
-    String nowTime = DateFormat('hh:mm a').format(timestamp);
+  // Future<void> sendGMessage(
+  //     String groupId, String message, String imagePath) async {
+  //   String chatId = uuid.v6();
+  //   DateTime timestamp = DateTime.now();
+  //   String nowTime = DateFormat('hh:mm a').format(timestamp);
+  //   if (message.isEmpty) {
+  //     print('Message is empty');
+  //     return;
+  //   }
 
-    List<Object> groupMembers = await getGroupMembers(groupId);
+  //   try {
+  //     // Fetch group members
+  //     List<Object> groupMembers = await getGroupMembers(groupId);
 
+  //     // Create new chat message
+  //     var newChat = ChatModel(
+  //       id: chatId,
+  //       message: message,
+  //       senderId: profileController.currentUser.value.id!,
+  //       timestamp: timestamp.toIso8601String(),
+  //       readBy: [
+  //         profileController.currentUser.value.id!
+  //       ], // Initialize with the current user's ID
+  //       imageUrl: imagePath,
+  //     );
+
+  //     // Create chat room details
+  //     var roomDetails = ChatRoomModel(
+  //       id: groupId,
+  //       lastMessage: message,
+  //       lastMessageTimestamp: nowTime,
+  //       timestamp: timestamp.toIso8601String(),
+  //       unReadMessNo: groupMembers.length, // Initialize unread message count
+  //     );
+
+  //     // Update Firestore
+  //     await db
+  //         .collection("groups")
+  //         .doc(groupId)
+  //         .collection("messages")
+  //         .doc(chatId)
+  //         .set(newChat.toJson());
+  //     await db.collection("groups").doc(groupId).update(roomDetails.toJson());
+  //   } catch (e) {
+  //     print("Error sending message: $e");
+  //   }
+  // }
+
+  Future<void> sendGroupMessage(
+      String message, String groupId, String imagePath) async {
+    isLoading.value = true;
+    var chatId = uuid.v6();
+    String imageUrl =
+        await profileController.uploadFileToFirebase(selectedImagePath.value);
     var newChat = ChatModel(
       id: chatId,
       message: message,
-      senderId: profileController.currentUser.value.id,
+      imageUrl: imageUrl,
+      senderId: auth.currentUser!.uid,
+      senderName: profileController.currentUser.value.name,
       timestamp: DateTime.now().toString(),
-      readBy: [profileController.currentUser.value.id!], // Initialize with the current user's ID
     );
-
-    var roomDetails = ChatRoomModel(
-      id: groupId,
-      lastMessage: message,
-      lastMessageTimestamp: nowTime,
-      timestamp: DateTime.now().toString(),
-      unReadMessNo: groupMembers.length, // Initialize unread message count
-    );
-
-    try {
-      await db
-          .collection("chats")
-          .doc(groupId)
-          .collection("messages")
-          .doc(chatId)
-          .set(newChat.toJson());
-
-      await db.collection("chats").doc(groupId).set(roomDetails.toJson());
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Stream<List<ChatModel>> getGroupMessages(String groupId) {
-    return db
+    await db
         .collection("groups")
         .doc(groupId)
         .collection("messages")
-        .orderBy("timestamp", descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(
-                (doc) => ChatModel.fromJson(doc.data()),
-              )
-              .toList(),
+        .doc(chatId)
+        .set(
+          newChat.toJson(),
         );
+    selectedImagePath.value = "";
+    isLoading.value = false;
   }
+
+  // Stream<List<ChatModel>> getGroupMessages(String groupId) {
+  //   return db
+  //       .collection("groups")
+  //       .doc(groupId)
+  //       .collection("messages")
+  //       .orderBy("timestamp", descending: true)
+  //       .snapshots()
+  //       .map(
+  //         (snapshot) => snapshot.docs
+  //             .map(
+  //               (doc) => ChatModel.fromJson(doc.data()),
+  //             )
+  //             .toList(),
+  //       );
+  // }
 
   Future<bool> isUserAdmin(String groupId, String userId) async {
     try {
@@ -227,7 +261,7 @@ class GroupController extends GetxController {
     }
   }
 
-Future<void> markGMessagesAsRead(String groupId) async {
+  Future<void> markGMessagesAsRead(String groupId) async {
     QuerySnapshot<Map<String, dynamic>> messagesSnapshot = await db
         .collection("chats")
         .doc(groupId)
@@ -247,7 +281,10 @@ Future<void> markGMessagesAsRead(String groupId) async {
             .doc(groupId)
             .collection("messages")
             .doc(messageDoc.id)
-            .update({"readBy": FieldValue.arrayUnion([profileController.currentUser.value.id])});
+            .update({
+          "readBy":
+              FieldValue.arrayUnion([profileController.currentUser.value.id])
+        });
       }
     }
 
@@ -257,7 +294,7 @@ Future<void> markGMessagesAsRead(String groupId) async {
 
   Future<void> updateUnreadMessageCount(String groupId) async {
     List<Object> groupMembers = await getGroupMembers(groupId);
-    
+
     int unreadCount = await db
         .collection("chats")
         .doc(groupId)
@@ -354,11 +391,37 @@ Future<void> markGMessagesAsRead(String groupId) async {
     });
   }
 
+  Stream<List<ChatModel>> getGroupMessages(String groupId) {
+    return db
+        .collection("groups")
+        .doc(groupId)
+        .collection("messages")
+        .orderBy("timestamp", descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(
+                (doc) => ChatModel.fromJson(doc.data()),
+              )
+              .toList(),
+        );
+  }
+
+  // Stream<List<ChatModel>> getGroupMessages(String groupId) {
+  //   return db
+  //       .collection("groups")
+  //       .doc(groupId)
+  //       .collection("messages")
+  //       .orderBy("timestamp", descending: true)
+  //       .snapshots()
+  //       .map((snapshot) => snapshot.docs
+  //           .map((doc) => ChatModel.fromJson(doc.data()))
+  //           .toList());
+  // }
+
   Future<List<Object>> getGroupMembers(String groupId) async {
     var groupDoc = await db.collection('groups').doc(groupId).get();
     GroupModel group = GroupModel.fromJson(groupDoc.data()!);
     return group.members ?? [];
   }
-
-
 }

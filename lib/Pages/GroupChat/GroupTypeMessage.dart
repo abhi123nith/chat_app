@@ -1,14 +1,13 @@
 // ignore_for_file: sized_box_for_whitespace
 
 import 'package:chat_app/Controller/GroupController.dart';
+import 'package:chat_app/Controller/ImagePicker.dart';
 import 'package:chat_app/Model/GroupModel.dart';
 import 'package:chat_app/Widget/ImagePickerBottomSheet.dart';
+import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
-import '../../../Config/Images.dart';
-import '../../../Controller/ImagePicker.dart';
 
 class GroupTypeMessage extends StatelessWidget {
   final GroupModel groupModel;
@@ -17,6 +16,7 @@ class GroupTypeMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController messageController = TextEditingController();
+  
     RxString message = "".obs;
     ImagePickerController imagePickerController =
         Get.put(ImagePickerController());
@@ -77,7 +77,7 @@ class GroupTypeMessage extends StatelessWidget {
                     splashColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () {
-                      groupController.sendGMessage(
+                      groupController.sendGroupMessage(
                         messageController.text,
                         groupModel.id!,
                         "",

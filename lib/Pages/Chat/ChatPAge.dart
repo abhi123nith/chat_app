@@ -202,13 +202,18 @@ class ChatPage extends StatelessWidget {
                             String formattedTime =
                                 DateFormat('hh:mm a').format(timestamp);
 
-                            return ChatBubble(
-                              message: snapshot.data![index].message!,
-                              imageUrl: snapshot.data![index].imageUrl ?? "",
-                              isComming: snapshot.data![index].receiverId ==
-                                  profileController.currentUser.value.id,
-                              status: snapshot.data![index].readStatus!,
-                              time: formattedTime,
+                            return InkWell(
+                              onLongPress: () {
+                                showBottomSheet();
+                              },
+                              child: ChatBubble(
+                                message: snapshot.data![index].message!,
+                                imageUrl: snapshot.data![index].imageUrl ?? "",
+                                isComming: snapshot.data![index].receiverId ==
+                                    profileController.currentUser.value.id,
+                                status: snapshot.data![index].readStatus!,
+                                time: formattedTime,
+                              ),
                             );
                           },
                         );
@@ -265,5 +270,53 @@ class ChatPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void showBottomSheet() {
+    Get.bottomSheet(Expanded(
+      child: Container(
+        height: 110,
+        decoration: const BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        child: Column(
+          children: [
+            const Divider(),
+            InkWell(
+              onTap: () {
+                
+              },
+              child: Container(
+                margin: const EdgeInsets.only(left: 30),
+                child: const Row(
+                  children: [
+                    Icon(Icons.delete),
+                    SizedBox(width: 8),
+                    Text('Delete Message')
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            InkWell(
+              onTap: () {},
+              child: Container(
+                margin: const EdgeInsets.only(left: 30),
+                child: const Row(
+                  children: [
+                    Icon(Icons.delete),
+                    SizedBox(width: 8),
+                    Text('Edit Message')
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }
