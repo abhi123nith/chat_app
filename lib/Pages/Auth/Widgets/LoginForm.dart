@@ -1,5 +1,5 @@
 import 'package:chat_app/Controller/AuthController.dart';
-import 'package:chat_app/Pages/email_code.dart';
+import 'package:chat_app/Pages/Auth/ForgotPassword.dart';
 import 'package:chat_app/Widget/PrimaryButton.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,6 +18,7 @@ class LoginForm extends StatelessWidget {
         TextFormField(
           controller: email,
           validator: (value) {
+            value = value?.trim();
             if (value!.isEmpty) {
               Get.snackbar('Error!', 'Please Enter your email id');
               //  return ("Please Enter your email id.");
@@ -31,6 +32,7 @@ class LoginForm extends StatelessWidget {
             return null;
           },
           onSaved: (value) {
+            value = value?.trim();
             email.text = value!;
           },
           decoration: const InputDecoration(
@@ -44,6 +46,7 @@ class LoginForm extends StatelessWidget {
         TextFormField(
           controller: password,
           validator: (value) {
+            value = value?.trim();
             RegExp regex = RegExp(r'^.{6,}$');
             if (value!.isEmpty) {
               Get.snackbar('Error!', "Password is required for Login");
@@ -70,8 +73,7 @@ class LoginForm extends StatelessWidget {
           children: [
             InkWell(
               onTap: () {
-                // Get.to(const ForgotPassword());
-                Get.to(const OTPScreen());
+                Get.to(const ForgotPassword());
               },
               child: Text("Forgot Password ? ",
                   style: TextStyle(
