@@ -17,6 +17,7 @@ class ChattController extends GetxController {
 
   var uuid = const Uuid();
   RxString selectedImagePath = "".obs;
+  RxString selectedVideoPath = "".obs;
   ProfileController profileController = Get.put(ProfileController());
   ContactController contactController = Get.put(ContactController());
 
@@ -66,7 +67,7 @@ class ChattController extends GetxController {
   }
 
   Future<void> sendMessage(
-      String targetUserId, String message, UserModel targetUser) async {
+      String targetUserId, String message, UserModel targetUser, {required String videoPath}) async {
     isLoading.value = true;
     String chatId = uuid.v6();
     String roomId = getRoomId(targetUserId);
@@ -83,10 +84,16 @@ class ChattController extends GetxController {
       imageUrl.value =
           await profileController.uploadFileToFirebase(selectedImagePath.value);
     }
+    RxString videoUrl = "".obs;
+    if (selectedVideoPath.value.isNotEmpty) {
+      videoUrl.value =
+          await profileController.uploadFileToFirebase(selectedVideoPath.value);
+    }
     var newChat = ChatModel(
       id: chatId,
       message: message,
       imageUrl: imageUrl.value,
+      videoUrl: videoUrl.value,
       senderId: auth.currentUser?.uid ?? '',
       receiverId: targetUserId,
       senderName: currentUser.name ?? 'Unknown',

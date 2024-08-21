@@ -1,7 +1,6 @@
 import 'package:chat_app/Controller/AuthController.dart';
-import 'package:chat_app/Pages/Auth/ForgotPassword.dart';
+import 'package:chat_app/Pages/email_code.dart';
 import 'package:chat_app/Widget/PrimaryButton.dart';
-import 'package:chat_app/config/CustomMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,8 +15,24 @@ class LoginForm extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 40),
-        TextField(
+        TextFormField(
           controller: email,
+          validator: (value) {
+            if (value!.isEmpty) {
+              Get.snackbar('Error!', 'Please Enter your email id');
+              //  return ("Please Enter your email id.");
+            }
+            if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+                .hasMatch(value)) {
+              Get.snackbar('Error!', 'Please Enter a valid email id');
+              //   return ("Please Enter a valid Email");
+            }
+
+            return null;
+          },
+          onSaved: (value) {
+            email.text = value!;
+          },
           decoration: const InputDecoration(
             hintText: "Email",
             prefixIcon: Icon(
@@ -26,8 +41,23 @@ class LoginForm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 30),
-        TextField(
+        TextFormField(
           controller: password,
+          validator: (value) {
+            RegExp regex = RegExp(r'^.{6,}$');
+            if (value!.isEmpty) {
+              Get.snackbar('Error!', "Password is required for Login");
+              return ("Password is required for Login");
+            }
+            if (!regex.hasMatch(value)) {
+              Get.snackbar('Error!', "Password is Invalid!!!");
+              return ("Password is Invalid!!!");
+            }
+            return null;
+          },
+          onSaved: (value) {
+            password.text = value!;
+          },
           decoration: const InputDecoration(
             hintText: "Passowrd",
             prefixIcon: Icon(
@@ -40,7 +70,8 @@ class LoginForm extends StatelessWidget {
           children: [
             InkWell(
               onTap: () {
-                Get.to(const ForgotPassword());
+                // Get.to(const ForgotPassword());
+                Get.to(const OTPScreen());
               },
               child: Text("Forgot Password ? ",
                   style: TextStyle(
@@ -63,7 +94,6 @@ class LoginForm extends StatelessWidget {
                           email.text,
                           password.text,
                         );
-                        successMessage("Logged in successfully");
                       },
                       btnName: "LOGIN",
                       icon: Icons.lock_open_outlined,

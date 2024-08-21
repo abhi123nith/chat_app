@@ -299,7 +299,6 @@ class ProfilePage extends StatelessWidget {
                     backgroundColor: Colors.green,
                     icon: const Icon(Icons.download_done_rounded));
                 Get.back(); // Close the dialog and log out
-                successMessage("LogOuted Successfully");
               },
               child: const Text("Logout"),
             ),

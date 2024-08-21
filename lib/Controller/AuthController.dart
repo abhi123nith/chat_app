@@ -1,6 +1,8 @@
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -18,15 +20,22 @@ class AuthController extends GetxController {
         email: email,
         password: password,
       );
+      Fluttertoast.showToast(msg: "Logged in Successfully ");
       Get.offAllNamed("/homePage");
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
+        Get.snackbar('Oops!', 'User not found',
+            backgroundColor: Colors.redAccent);
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided for that user.');
+        Get.snackbar('Oops!', e.code.toString(),
+            backgroundColor: Colors.redAccent);
       }
     } catch (e) {
       print(e);
+      Get.snackbar('Error!', 'Please check details',
+          backgroundColor: Colors.redAccent);
     }
     isLoading.value = false;
   }
@@ -40,11 +49,15 @@ class AuthController extends GetxController {
       );
       await initUser(email, name);
       print("Account Created 🔥🔥");
-      Get.offAllNamed("/homePage");
+      Fluttertoast.showToast(msg: "Account Created Successfully ");
+      
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
+        Get.snackbar('Oops!', 'Your passward is too weak',
+            backgroundColor: Colors.redAccent);
       } else if (e.code == 'email-already-in-use') {
+        Get.snackbar('Oops!', 'The account already exists for that email.',
+            backgroundColor: Colors.redAccent);
         print('The account already exists for that email.');
       }
     } catch (e) {
@@ -55,6 +68,7 @@ class AuthController extends GetxController {
 
   Future<void> logoutUser() async {
     await auth.signOut();
+    Fluttertoast.showToast(msg: "Loggouted Successfully :)");
     Get.offAllNamed("/authPage");
   }
 
@@ -74,6 +88,7 @@ class AuthController extends GetxController {
           );
     } catch (ex) {
       print(ex);
+      Get.snackbar("Error", ex.toString());
     }
   }
 

@@ -88,7 +88,8 @@ class TypeMessage extends StatelessWidget {
                       if (messageController.text.isNotEmpty ||
                           chatController.selectedImagePath.value.isNotEmpty) {
                         chatController.sendMessage(
-                            userModel.id!, messageController.text, userModel);
+                            userModel.id!, messageController.text, userModel,
+                            videoPath: '');
                         messageController.clear();
                         message.value = "";
                       }

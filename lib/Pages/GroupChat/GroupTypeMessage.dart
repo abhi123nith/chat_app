@@ -16,7 +16,7 @@ class GroupTypeMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController messageController = TextEditingController();
-  
+
     RxString message = "".obs;
     ImagePickerController imagePickerController =
         Get.put(ImagePickerController());
@@ -78,10 +78,7 @@ class GroupTypeMessage extends StatelessWidget {
                     highlightColor: Colors.transparent,
                     onTap: () {
                       groupController.sendGroupMessage(
-                        messageController.text,
-                        groupModel.id!,
-                        "",
-                      );
+                          messageController.text, groupModel.id!, "", "");
                       messageController.clear();
                       message.value = "";
                     },

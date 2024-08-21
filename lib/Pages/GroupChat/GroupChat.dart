@@ -120,6 +120,7 @@ class GroupChatPage extends StatelessWidget {
                               status: chat.readStatus ?? "sent",
                               messageId: chat.id!,
                               roomId: groupModel.id!,
+                              videoUrl: chat.videoUrl!,
                             );
                           },
                         );

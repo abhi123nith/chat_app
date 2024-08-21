@@ -4,7 +4,9 @@ import 'package:chat_app/Pages/ProfilePage/fullpicfromUrl.dart';
 import 'package:chat_app/config/CustomMessage.dart';
 import 'package:chat_app/config/Images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:get/get.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -15,6 +17,7 @@ class ChatBubble extends StatelessWidget {
   final String time;
   final String status;
   final String imageUrl;
+  final String videoUrl;
 
   const ChatBubble({
     super.key,
@@ -25,6 +28,7 @@ class ChatBubble extends StatelessWidget {
     required this.time,
     required this.status,
     required this.imageUrl,
+    required this.videoUrl,
   });
 
   @override
@@ -65,7 +69,7 @@ class ChatBubble extends StatelessWidget {
                         bottomRight: Radius.circular(0),
                       ),
               ),
-              child: imageUrl.isEmpty
+              child: imageUrl.isEmpty && videoUrl.isEmpty
                   ? Text(message)
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,25 +143,38 @@ class ChatBubble extends StatelessWidget {
       builder: (BuildContext context) {
         return Wrap(
           children: [
-            if (imageUrl.isEmpty)
+            if (imageUrl.isEmpty && videoUrl.isEmpty)
               ListTile(
                 leading: const Icon(Icons.copy),
                 title: const Text('Copy Message'),
-                onTap: () {
-                  print('Copy Message tapped');
-                  Navigator.pop(context);
+                onTap: () async {
+                  await Clipboard.setData(ClipboardData(text: message))
+                      .then((value) {
+                    Get.back();
+                    successMessage('Copied');
+                  });
+
+                  Get.back();
                 },
               ),
             if (imageUrl.isNotEmpty && isComming)
               ListTile(
                 leading: const Icon(Icons.download),
                 title: const Text('Download'),
-                onTap: () {
+                onTap: () async {
                   print('Download tapped');
-                  Navigator.pop(context);
+                  await GallerySaver.saveImage(imageUrl, albumName: 'Sampark')
+                      .then((success) {
+                    if (success != null && success) {
+                      Get.back();
+                      successMessage('Downloaded');
+                    }
+                    print('Downloaded');
+                    Get.back();
+                  });
                 },
               ),
-            if (imageUrl.isEmpty && !isComming)
+            if (imageUrl.isEmpty && !isComming && videoUrl.isEmpty)
               ListTile(
                 leading: const Icon(Icons.edit),
                 title: const Text('Edit Message'),

@@ -19,6 +19,7 @@ class GroupController extends GetxController {
   var uuid = const Uuid();
   RxBool isLoading = false.obs;
   RxString selectedImagePath = "".obs;
+  RxString selectedVideoPath = "".obs;
   RxList<GroupModel> groupList = <GroupModel>[].obs;
   ProfileController profileController = Get.put(ProfileController());
 
@@ -157,16 +158,19 @@ class GroupController extends GetxController {
   //   }
   // }
 
-  Future<void> sendGroupMessage(
-      String message, String groupId, String imagePath) async {
+  Future<void> sendGroupMessage(String message, String groupId,
+      String imagePath, String videoPath) async {
     isLoading.value = true;
     var chatId = uuid.v6();
     String imageUrl =
         await profileController.uploadFileToFirebase(selectedImagePath.value);
+    String videoUrl =
+        await profileController.uploadFileToFirebase(selectedVideoPath.value);
     var newChat = ChatModel(
       id: chatId,
       message: message,
       imageUrl: imageUrl,
+      videoUrl: videoUrl,
       senderId: auth.currentUser!.uid,
       senderName: profileController.currentUser.value.name,
       timestamp: DateTime.now().toString(),
@@ -186,7 +190,9 @@ class GroupController extends GetxController {
       'lastMessage': message,
       'lastMessageTime': DateTime.now().toString(),
     });
-    selectedImagePath.value = "";
+    selectedImagePath.value = "image";
+    selectedVideoPath.value = "video";
+
     isLoading.value = false;
   }
 
