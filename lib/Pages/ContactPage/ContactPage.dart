@@ -109,7 +109,6 @@ class ContactPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               ElevatedButton(
                                 onPressed: () {
@@ -125,6 +124,7 @@ class ContactPage extends StatelessWidget {
                                       color: Colors.white, fontSize: 16),
                                 ),
                               ),
+                              const SizedBox(width: 40),
                               ElevatedButton(
                                 onPressed: () {
                                   Get.to(const LiveScreenView(
