@@ -16,6 +16,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       await FirebaseMessaging.instance.getInitialMessage();
 
   if (initialMessage != null) {
+    // ignore: unused_local_variable
     PushNotification notification = PushNotification(
         title: initialMessage.notification?.title ?? '',
         body: initialMessage.notification?.body ?? '',

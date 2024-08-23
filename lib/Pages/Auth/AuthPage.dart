@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, unused_field
+
 import 'package:chat_app/Controller/notificationController.dart';
 import 'package:chat_app/Pages/Auth/Widgets/AuthPageBody.dart';
 import 'package:chat_app/Pages/Welcome/Widgets/WelcomeHeading.dart';

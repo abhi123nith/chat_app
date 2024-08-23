@@ -189,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: crypto
-      sha256: ff625774173754681d66daaf4a448684fb04b78f902da9cb3d308c19cc5e8bab
+      sha256: ec30d999af904f33454ba22ed9a86162b35e52b44ac4807d1d93c288041d7d27
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.3"
+    version: "3.0.5"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -561,10 +561,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_android
-      sha256: "8c5abf0dcc24fe6e8e0b4a5c0b51a5cf30cefdf6407a3213dae61edc75a70f56"
+      sha256: c0a6763d50b354793d0192afd0a12560b823147d3ded7c6b77daf658fa05cc85
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.12+12"
+    version: "0.8.12+13"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -825,10 +825,10 @@ packages:
     dependency: transitive
     description:
       name: permission_handler_android
-      sha256: eaf2a1ec4472775451e88ca6a7b86559ef2f1d1ed903942ed135e38ea0097dca
+      sha256: "76e4ab092c1b240d31177bb64d2b0bea43f43d0e23541ec866151b9f7b2490fa"
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.8"
+    version: "12.0.12"
   permission_handler_apple:
     dependency: transitive
     description:
@@ -998,10 +998,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: "3da423ce7baf868be70e2c0976c28a1bb2f73644268b7ffa7d2e08eab71f16a4"
+      sha256: "7b41b6c3507854a159e24ae90a8e3e9cc01eb26a477c118d6dca065b5f55453e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4"
+    version: "2.5.4+2"
   stack_trace:
     dependency: transitive
     description:
@@ -1038,10 +1038,10 @@ packages:
     dependency: transitive
     description:
       name: synchronized
-      sha256: "539ef412b170d65ecdafd780f924e5be3f60032a1128df156adad6c5b373d558"
+      sha256: a824e842b8a054f91a728b783c177c1e4731f6b124f9192468457a8913371255
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0+1"
+    version: "3.2.0"
   term_glyph:
     dependency: transitive
     description:
@@ -1086,10 +1086,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "94d8ad05f44c6d4e2ffe5567ab4d741b82d62e3c8e288cc1fcea45965edf47c9"
+      sha256: e35a698ac302dd68e41f73250bd9517fe3ab5fa4f18fe4647a0872db61bacbab
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.8"
+    version: "6.3.10"
   url_launcher_ios:
     dependency: transitive
     description:
@@ -1246,10 +1246,10 @@ packages:
     dependency: transitive
     description:
       name: zego_express_engine
-      sha256: "86354c4c83e6b792bdc09ec79815e5c6c1ff61a2e5380f60a8b7db6ebe6553f1"
+      sha256: "5d4f8f24445a57fb7b74139834e875701a534b581235f26577f2350fef0fb92f"
       url: "https://pub.dev"
     source: hosted
-    version: "3.16.0"
+    version: "3.16.2"
   zego_plugin_adapter:
     dependency: transitive
     description:
@@ -1302,10 +1302,10 @@ packages:
     dependency: transitive
     description:
       name: zego_zim
-      sha256: "7619df3f82e4bf1a39cca48b7cbe646d03d6707dfe69506e7f80513ca6c3778b"
+      sha256: beaf48e5055f30244336f60f46ba25cfe74601f31b9dfeb3d19616c2923ab791
       url: "https://pub.dev"
     source: hosted
-    version: "2.17.0"
+    version: "2.17.1"
   zego_zpns:
     dependency: transitive
     description:
@@ -1315,5 +1315,5 @@ packages:
     source: hosted
     version: "2.6.0+3"
 sdks:
-  dart: ">=3.4.0 <4.0.0"
-  flutter: ">=3.22.0"
+  dart: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
