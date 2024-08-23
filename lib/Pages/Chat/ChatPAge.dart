@@ -81,7 +81,11 @@ class ChatPage extends StatelessWidget {
 
                             if (!snapshot.hasData ||
                                 snapshot.data!.status == null) {
-                              return const Text("Offline");
+                              return const Text(
+                                "Offline",
+                                style:
+                                    TextStyle(fontSize: 16, color: Colors.grey),
+                              );
                             }
 
                             var userStatus = snapshot.data!;

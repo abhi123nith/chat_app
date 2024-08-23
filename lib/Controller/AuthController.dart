@@ -137,7 +137,7 @@ class AuthController extends GetxController {
         Get.snackbar('Oops!', 'The account already exists for that email.',
             backgroundColor: Colors.redAccent);
         print('The account already exists for that email.');
-        Get.to(AuthPage());
+        Get.to(const AuthPage());
       }
     } catch (e) {
       print(e);

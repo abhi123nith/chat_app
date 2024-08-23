@@ -111,19 +111,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           var user = users[index];
-                          // Ensure user fields are not null
+
+                          // Handle null values with fallback defaults
                           return InkWell(
                             onTap: () {
                               Get.to(ChatPage(userModel: user));
                             },
                             child: ChatTile(
-                              imageUrl: user.profileImage?.isNotEmpty == true
+                              imageUrl: (user.profileImage?.isNotEmpty ?? false)
                                   ? user.profileImage!
                                   : AssetsImage.defaultProfileUrl,
                               name: user.name ?? 'User',
-                              lastChat: user.about == ""
-                                  ? 'Hey, I am using Sampark App!'
-                                  : user.about!,
+                              lastChat: (user.about?.isNotEmpty ?? false)
+                                  ? user.about!
+                                  : 'Hey, I am using Sampark App!',
                               lastTime: '',
                               roomId: '',
                               isCurrentUser: user.id == currentUserId,

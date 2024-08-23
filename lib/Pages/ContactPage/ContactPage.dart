@@ -74,7 +74,7 @@ class ContactPage extends StatelessWidget {
                       name: user.id == profileController.currentUser.value.id
                           ? 'You'
                           : user.name ?? 'User',
-                      lastChat: user.about ?? 'Hey there!',
+                      lastChat: user.about ?? 'Hey ,I am using Sampark App!',
                       lastTime:
                           '', // Update this according to your requirements
                       roomId: '', // Handle this appropriately
