@@ -29,7 +29,7 @@
     <application
         android:label="Sampark"
         android:name="${applicationName}"
-        android:icon="assets/Icons/gallary.svg">
+        android:icon="assets/Icons/icon.png">
         <activity
             android:name=".MainActivity"
             android:exported="true"
